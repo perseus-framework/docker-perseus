@@ -1,2 +1,128 @@
-# Template file for alpine linux implementation of Docker
-# for local developement.
+# Pull alpine as our base image.
+FROM alpine:%%ALPINE_OS_VERSION%% AS base
+
+# Install dependencies required to build OpenSSL from source.
+RUN apk update; \
+    apk add \
+    --no-cache \
+    --progress \
+    --quiet \
+    ca-certificates \
+    gcc \
+    linux-headers \
+    make \
+    musl-dev \
+    perl;
+
+# Work from the root of the OpenSSL source.
+WORKDIR /openssl-src
+
+# Build OpenSSL from source.
+# TODO: Provide string interpolation of OpenSSL semver.
+RUN set eux; \
+    wget -c \
+    https://github.com/openssl/openssl/archive/OpenSSL_1_1_1q.tar.gz -O - \
+    | tar --strip-components=1 -xz; \
+    CC="gcc -fPIE -pie" ./Configure no-shared no-async \
+    --prefix=/usr \
+    --openssldir=/usr linux-x86_64; \
+    make depend; \
+    make -j$(nproc); \
+    make install_sw;
+
+# Install remaining dependencies.
+RUN apk update; \
+    apk add \
+    --no-cache \
+    --progress \
+    --quiet \
+    alpine-sdk=%%ALPINE_PKG_ALPINE_SDK_VERSION%% \
+    gawk=%%ALPINE_PKG_GAWK_VERSION%% \
+    libstdc++=%%ALPINE_PKG_LIB_STD_CPP_VERSION%% \
+    openrc=%%ALPINE_PKG_OPENRC_VERSION%% \
+    pkgconf=%%ALPINE_PKG_PKGCONF_VERSION%% \
+    zlib-dev=%%ALPINE_PKG_ZLIB_DEV_VERSION%%;
+
+# Work from the root of the container.
+WORKDIR /
+
+# Install rust and build targets.
+RUN set -eux; \
+    rm -rf /openssl-src; \
+    RUSTUP_HOME="${HOME}/.rustup"; \
+    CARGO_HOME="${HOME}/.cargo"; \
+    PATH="${HOME}/.cargo/bin:${PATH}"; \
+    RUST_VERSION=%%RUST_VERSION%%; \
+    RUSTUP_VERSION=%%RUSTUP_VERSION%%; \
+    RUST_ARCH=%%RUST_ARCH%%; \
+    curl --progress-bar -Lo rustup-init \
+    "https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/${RUST_ARCH}/rustup-init"; \
+    echo "$( \
+        curl --progress-bar -Lo - \
+        https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/${RUST_ARCH}/rustup-init.sha256 \
+        | tr -d '\n' \
+        | cut -d ' ' -f 1 \
+    ) *rustup-init" \
+    | sha256sum -c -; \
+    chmod +x rustup-init; \
+    ./rustup-init -y \
+    --no-modify-path \
+    --profile minimal \
+    --default-toolchain "${RUST_VERSION}" \
+    --default-host "${RUST_ARCH}" \
+    --target wasm32-unknown-unknown; \
+    rm rustup-init; \
+    chmod -R a+w "${RUSTUP_HOME}" "${CARGO_HOME}"; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version;
+
+# Build stage dedicated to binaryen that we can run in parallel.
+FROM base AS binaryen
+
+# Work from the install path of binaryen.
+WORKDIR /binaryen
+
+RUN set -eux; \
+    curl --progress-bar -Lo - \
+    https://github.com/WebAssembly/binaryen/releases/download/version_%%BINARYEN_VERSION%%/binaryen-version_%%BINARYEN_VERSION%%-x86_64-linux.tar.gz \
+    | tar --strip-components=1 -xz;
+
+# Build stage dedicated to bonnie that we can run in parallel.
+FROM base AS bonnie
+
+# Work from the install path of bonnie.
+WORKDIR /bonnie
+
+RUN set -eux; \
+    cargo install bonnie \
+    --version %%BONNIE_VERSION%% \
+    --target %%RUST_ARCH%%; \
+    mv "${HOME}/.cargo/bin/bonnie" "$(pwd)";
+
+# Build stage dedicated to esbuild that we can run in parallel.
+FROM base AS esbuild
+
+# Work from the install path of esbuild.
+WORKDIR /esbuild
+
+RUN set -eux; \
+    curl --progress-bar -Lo - \
+    https://registry.npmjs.org/esbuild-linux-64/-/esbuild-linux-64-%%ESBUILD_VERSION%%.tgz \
+    | tar --strip-components=1 -xz;
+
+# Build stage dedicated to wasm-pack that we can run in parallel.
+FROM base AS wasm-pack
+
+# Work from the install path of wasm-pack.
+WORKDIR /wasm-pack
+
+RUN set -eux; \
+    OPENSSL_DIR=/usr/bin/openssl; \
+    OPENSSL_STATIC=true; \
+    PKG_CONFIG_PATH=/usr/lib/pkgconfig; \
+    PKG_CONFIG_ALLOW_CROSS=1; \
+    cargo install wasm-pack \
+    --version %%WASM_PACK_VERSION%% \
+    --target %%RUST_ARCH%%; \
+    mv "${HOME}/.cargo/bin/wasm-pack" "$(pwd)"
