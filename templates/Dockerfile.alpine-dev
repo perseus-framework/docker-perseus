@@ -7,21 +7,26 @@ RUN apk update; \
     --no-cache \
     --progress \
     --quiet \
-    ca-certificates \
-    gcc \
-    linux-headers \
-    make \
-    musl-dev \
-    perl;
+    ca-certificates=%%ALPINE_PKG_CA_CERTIFICATES_VERSION%% \
+    gcc=%%ALPINE_PKG_GCC_VERSION%% \
+    linux-headers=%%ALPINE_PKG_LINUX_HEADERS_VERSION%% \
+    make=%%ALPINE_PKG_MAKE_VERSION%% \
+    musl-dev=%%ALPINE_PKG_MUSL_DEV_VERSION%% \
+    perl=%%ALPINE_PKG_PERL_VERSION%%;
 
 # Work from the root of the OpenSSL source.
 WORKDIR /openssl-src
 
 # Build OpenSSL from source.
-# TODO: Provide string interpolation of OpenSSL semver.
 RUN set eux; \
+    OSSL_V="$( \
+        wget -c \
+        https://raw.githubusercontent.com/alpinelinux/aports/v%%ALPINE_OS_VERSION%%/main/openssl/APKBUILD -O - \
+        | perl -n -e'/^pkgver=(.*)$/ && print $1' \
+        | sed 's|\.|\_|g' \
+    )"; \
     wget -c \
-    https://github.com/openssl/openssl/archive/OpenSSL_1_1_1q.tar.gz -O - \
+    "https://github.com/openssl/openssl/archive/OpenSSL_${OSSL_V}.tar.gz" -O - \
     | tar --strip-components=1 -xz; \
     CC="gcc -fPIE -pie" ./Configure no-shared no-async \
     --prefix=/usr \
