@@ -18,6 +18,8 @@ RUN apk update; \
 WORKDIR /openssl-src
 
 # Build OpenSSL from source.
+# TODO: Change urls to replacement strings to be interpolated by scripts.
+# TODO: Perform piped actions within scripts to reduce process count.
 RUN set eux; \
     OSSL_V="$( \
         wget -c \
@@ -51,15 +53,18 @@ RUN apk update; \
 # Work from the root of the container.
 WORKDIR /
 
-# Install rust and build targets.
+ENV RUSTUP_HOME="${HOME}/.rustup" \
+    CARGO_HOME="${HOME}/.cargo" \
+    PATH="${HOME}/.cargo/bin:${PATH}" \
+    RUST_VERSION=%%RUST_VERSION%% \
+    RUSTUP_VERSION=%%RUSTUP_VERSION%% \
+    RUST_ARCH=%%RUST_ARCH%%
+
+# Install `rust` and build targets.
+# TODO: Change urls to replacement strings to be interpolated by scripts.
+# TODO: Perform piped actions within scripts to reduce process count.
 RUN set -eux; \
     rm -rf /openssl-src; \
-    RUSTUP_HOME="${HOME}/.rustup"; \
-    CARGO_HOME="${HOME}/.cargo"; \
-    PATH="${HOME}/.cargo/bin:${PATH}"; \
-    RUST_VERSION=%%RUST_VERSION%%; \
-    RUSTUP_VERSION=%%RUSTUP_VERSION%%; \
-    RUST_ARCH=%%RUST_ARCH%%; \
     curl --progress-bar -Lo rustup-init \
     "https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/${RUST_ARCH}/rustup-init"; \
     echo "$( \
@@ -88,6 +93,9 @@ FROM base AS binaryen
 # Work from the install path of binaryen.
 WORKDIR /binaryen
 
+# Install `binaryen` into the install path.
+# TODO: Change urls to replacement strings to be interpolated by scripts.
+# TODO: Perform piped actions within scripts to reduce process count.
 RUN set -eux; \
     curl --progress-bar -Lo - \
     https://github.com/WebAssembly/binaryen/releases/download/version_%%BINARYEN_VERSION%%/binaryen-version_%%BINARYEN_VERSION%%-x86_64-linux.tar.gz \
@@ -99,6 +107,7 @@ FROM base AS bonnie
 # Work from the install path of bonnie.
 WORKDIR /bonnie
 
+# Install `bonnie` into the install path.
 RUN set -eux; \
     cargo install bonnie \
     --version %%BONNIE_VERSION%% \
@@ -111,6 +120,9 @@ FROM base AS esbuild
 # Work from the install path of esbuild.
 WORKDIR /esbuild
 
+# Install `esbuild` into the install path.
+# TODO: Change urls to replacement strings to be interpolated by scripts.
+# TODO: Perform piped actions within scripts to reduce process count.
 RUN set -eux; \
     curl --progress-bar -Lo - \
     https://registry.npmjs.org/esbuild-linux-64/-/esbuild-linux-64-%%ESBUILD_VERSION%%.tgz \
@@ -122,6 +134,7 @@ FROM base AS wasm-pack
 # Work from the install path of wasm-pack.
 WORKDIR /wasm-pack
 
+# Install `wasm-pack` into the install path.
 RUN set -eux; \
     OPENSSL_DIR=/usr/bin/openssl; \
     OPENSSL_STATIC=true; \
@@ -131,3 +144,13 @@ RUN set -eux; \
     --version %%WASM_PACK_VERSION%% \
     --target %%RUST_ARCH%%; \
     mv "${HOME}/.cargo/bin/wasm-pack" "$(pwd)"
+
+# Build stage dedicated to the codebase of the framework we can run in parallel.
+FROM base AS framework
+
+# Work from the root of the codebase.
+WORKDIR /framesurge
+
+# Download and patch the codebase of perseus.
+# TODO: Change urls to replacement strings to be interpolated by scripts.
+# TODO: Perform piped actions within scripts to reduce process count.
