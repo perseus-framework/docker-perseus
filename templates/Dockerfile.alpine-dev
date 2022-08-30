@@ -1,27 +1,40 @@
 # Pull alpine as our base image.
 FROM alpine:%%ALPINE_OS_VERSION%% AS base
 
-# Install dependencies required to build OpenSSL from source.
-RUN apk update; \
+# Work from the root of the container.
+WORKDIR /
+
+# Install dependencies in as few build layers as possible.
+# TODO: Change urls to replacement strings to be interpolated by scripts.
+# TODO: Perform piped actions within scripts to reduce process count.
+RUN set eux; \
+    printf '%s\n' "Installing: Alpine Packages"; \
+    apk update; \
     apk add \
     --no-cache \
     --progress \
     --quiet \
+    alpine-sdk=%%ALPINE_PKG_ALPINE_SDK_VERSION%% \
     ca-certificates=%%ALPINE_PKG_CA_CERTIFICATES_VERSION%% \
+    gawk=%%ALPINE_PKG_GAWK_VERSION%% \
     gcc=%%ALPINE_PKG_GCC_VERSION%% \
+    libstdc++=%%ALPINE_PKG_LIB_STD_CPP_VERSION%% \
     linux-headers=%%ALPINE_PKG_LINUX_HEADERS_VERSION%% \
     make=%%ALPINE_PKG_MAKE_VERSION%% \
     musl-dev=%%ALPINE_PKG_MUSL_DEV_VERSION%% \
-    perl=%%ALPINE_PKG_PERL_VERSION%%;
-
-# Work from the root of the OpenSSL source.
-WORKDIR /openssl-src
-
-# Build OpenSSL from source.
-# TODO: Change urls to replacement strings to be interpolated by scripts.
-# TODO: Perform piped actions within scripts to reduce process count.
-RUN set eux; \
-    OSSL_V="$( \
+    openrc=%%ALPINE_PKG_OPENRC_VERSION%% \
+    perl=%%ALPINE_PKG_PERL_VERSION%% \
+    pkgconf=%%ALPINE_PKG_PKGCONF_VERSION%% \
+    zlib-dev=%%ALPINE_PKG_ZLIB_DEV_VERSION%%; \
+    printf '%s\n' "Installing: OpenSSL"; \
+    export RUSTUP_HOME="${HOME}/.rustup"; \
+    export CARGO_HOME="${HOME}/.cargo"; \
+    export PATH="${HOME}/.cargo/bin:${PATH}"; \
+    export RUST_VERSION=%%RUST_VERSION%%; \
+    export RUSTUP_VERSION=%%RUSTUP_VERSION%%; \
+    export RUST_ARCH=%%RUST_ARCH%%; \
+    mkdir /openssl-src; \
+    export OSSL_V="$( \
         wget -c \
         https://raw.githubusercontent.com/alpinelinux/aports/v%%ALPINE_OS_VERSION%%/main/openssl/APKBUILD -O - \
         | perl -n -e'/^pkgver=(.*)$/ && print $1' \
@@ -29,42 +42,17 @@ RUN set eux; \
     )"; \
     wget -c \
     "https://github.com/openssl/openssl/archive/OpenSSL_${OSSL_V}.tar.gz" -O - \
-    | tar --strip-components=1 -xz; \
+    | tar --strip-components=1 -C /openssl-src -xz; \
+    cd /openssl-src; \
     CC="gcc -fPIE -pie" ./Configure no-shared no-async \
     --prefix=/usr \
     --openssldir=/usr linux-x86_64; \
     make depend; \
     make -j$(nproc); \
-    make install_sw;
-
-# Install remaining dependencies.
-RUN apk update; \
-    apk add \
-    --no-cache \
-    --progress \
-    --quiet \
-    alpine-sdk=%%ALPINE_PKG_ALPINE_SDK_VERSION%% \
-    gawk=%%ALPINE_PKG_GAWK_VERSION%% \
-    libstdc++=%%ALPINE_PKG_LIB_STD_CPP_VERSION%% \
-    openrc=%%ALPINE_PKG_OPENRC_VERSION%% \
-    pkgconf=%%ALPINE_PKG_PKGCONF_VERSION%% \
-    zlib-dev=%%ALPINE_PKG_ZLIB_DEV_VERSION%%;
-
-# Work from the root of the container.
-WORKDIR /
-
-ENV RUSTUP_HOME="${HOME}/.rustup" \
-    CARGO_HOME="${HOME}/.cargo" \
-    PATH="${HOME}/.cargo/bin:${PATH}" \
-    RUST_VERSION=%%RUST_VERSION%% \
-    RUSTUP_VERSION=%%RUSTUP_VERSION%% \
-    RUST_ARCH=%%RUST_ARCH%%
-
-# Install `rust` and build targets.
-# TODO: Change urls to replacement strings to be interpolated by scripts.
-# TODO: Perform piped actions within scripts to reduce process count.
-RUN set -eux; \
+    make install_sw; \
+    cd /; \
     rm -rf /openssl-src; \
+    printf '%s\n' "Installing: Rust"; \
     curl --progress-bar -Lo rustup-init \
     "https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/${RUST_ARCH}/rustup-init"; \
     echo "$( \
@@ -136,21 +124,32 @@ WORKDIR /wasm-pack
 
 # Install `wasm-pack` into the install path.
 RUN set -eux; \
-    OPENSSL_DIR=/usr/bin/openssl; \
-    OPENSSL_STATIC=true; \
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig; \
-    PKG_CONFIG_ALLOW_CROSS=1; \
+    export OPENSSL_DIR=/usr/bin/openssl; \
+    export OPENSSL_STATIC=true; \
+    export PKG_CONFIG_PATH=/usr/lib/pkgconfig; \
+    export PKG_CONFIG_ALLOW_CROSS=1; \
     cargo install wasm-pack \
     --version %%WASM_PACK_VERSION%% \
     --target %%RUST_ARCH%%; \
     mv "${HOME}/.cargo/bin/wasm-pack" "$(pwd)"
 
 # Build stage dedicated to the codebase of the framework we can run in parallel.
-FROM base AS framework
+FROM base AS codebase
 
 # Work from the root of the codebase.
-WORKDIR /framesurge
+WORKDIR /perseus
 
 # Download and patch the codebase of perseus.
 # TODO: Change urls to replacement strings to be interpolated by scripts.
 # TODO: Perform piped actions within scripts to reduce process count.
+
+# FROM codebase AS examples-size-opt
+# TODO: Iterate over all examples and implement perseus-size-opt.
+
+# FROM codebase AS examples-wee-alloc
+# TODO: Iterate over all examples and implement manual config of wee_alloc.
+
+# FROM codebase AS framework
+# TODO: Provide build arguments and env vars.
+# TODO: Copy all tools and examples from previous build stages.
+# NOTE: This is the final image, the rest is up to the user.
