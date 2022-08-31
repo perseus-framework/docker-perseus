@@ -9,13 +9,39 @@ def get_alpine_version(tag):
         case "0.3.0" | "0.3.1" | "0.3.2" | "0.3.3" | "0.3.4" | "0.3.5":
             return "3.15.6"
         case _:
-            p = re.compile('^(0.[4-9]{1,}.*)$')
+            p = re.compile('^0\.[4-9]{1,}.*$')
             m = p.match(tag)
-            
             if m is not None:
                 return "3.16.2"
             else:
                 return None
+
+def get_alpine_pkg_string(tag, pkg):
+    os_release = ''
+    p = re.compile(
+        '.* pkgname=([^ ]{1,}).* pkgver=([^ ]{1,}).* pkgrel=([^ ]{1,}) .*'
+    )
+    match tag:
+        case "3.15.6":
+            os_release = tag
+        case "3.16.2":
+            os_release = tag
+        case _:
+            return None
+    url = 'https://raw.githubusercontent.com/alpinelinux/aports/v' + \
+            os_release + \
+            '/main/' + \
+            pkg + \
+            '/APKBUILD'
+    with request.urlopen(url) as response:
+        pkg_data = response.read()\
+                    .decode('UTF-8')\
+                    .replace('\n', ' ')
+        m = p.search(pkg_data)
+        if m.group(1) == pkg:
+            return m.group(1) + '=' + m.group(2) + '-r' + m.group(3)
+        else:
+            return None
 
 perseus_version = "0.3.0"
 
