@@ -40,12 +40,162 @@ def get_alpine_pkg_string(tag, pkg):
         case _:
             return None
 
+def get_granular_dependency_version(tag, dep):
+    match dep:
+        case "binaryen":
+            match tag:
+                case "0.3.0" | "0.3.1" | "0.3.2":
+                    return "104"
+                case "0.3.3" | "0.3.4" | "0.3.5":
+                    return "105"
+                case "0.4.0-beta.1":
+                    return "108"
+                case "0.4.0-beta.2" \
+                    | "0.4.0-beta.3" \
+                    | "0.4.0-beta.4" \
+                    | "0.4.0-beta.5" \
+                    | "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "109"
+                case _:
+                    return None
+        case "bonnie":
+            return "0.3.2"
+        case "esbuild":
+            match tag:
+                case "0.3.0":
+                    return "0.14.6"
+                case "0.3.1":
+                    return "0.14.10"
+                case "0.3.2":
+                    return "0.14.11"
+                case "0.3.3":
+                    return "0.14.21"
+                case "0.3.4" | "0.3.5":
+                    return "0.14.36"
+                case "0.4.0-beta.1":
+                    return "0.14.42"
+                case "0.4.0-beta.2":
+                    return "0.14.47"
+                case "0.4.0-beta.3":
+                    return "0.14.48"
+                case "0.4.0-beta.4" | "0.4.0-beta.5":
+                    return "0.14.49"
+                case "0.4.0-beta.6" | "0.4.0-beta.7":
+                    return "0.15.3"
+                case _:
+                    return None
+        case "node":
+            match tag:
+                case "0.3.0" | "0.3.1":
+                    return "17.3.0"
+                case "0.3.2":
+                    return "17.3.1"
+                case "0.3.3":
+                    return "17.5.0"
+                case "0.3.4" | "0.3.5":
+                    return "18.0.0"
+                case "0.4.0-beta.1":
+                    return "18.2.0"
+                case "0.4.0-beta.2" | "0.4.0-beta.3":
+                    return "18.4.0"
+                case "0.4.0-beta.4" | "0.4.0-beta.5":
+                    return "18.6.0"
+                case "0.4.0-beta.6" | "0.4.0-beta.7":
+                    return "18.7.0"
+                case _:
+                    return None
+        case "npm":
+            match tag:
+                case "0.3.0" | "0.3.1." | "0.3.2":
+                    return "8.3.0"
+                case "0.3.3":
+                    return "8.4.1"
+                case "0.3.4" | "0.3.5":
+                    return "8.6.0"
+                case "0.4.0-beta.1":
+                    return "8.9.0"
+                case "0.4.0-beta.2" | "0.4.0-beta.3":
+                    return "8.12.1"
+                case "0.4.0-beta.4" | "0.4.0-beta.5":
+                    return "8.13.2"
+                case "0.4.0-beta.6" | "0.4.0-beta.7":
+                    return "8.15.0"
+                case _:
+                    return None
+        case "nvm":
+            return "0.39.1"
+        case "perseus-size-opt":
+            match tag:
+                case "0.3.0" | "0.3.1" | "0.3.2" | "0.3.3":
+                    return "0.1.7"
+                case "0.3.4":
+                    return "0.1.8"
+                case "0.3.5":
+                    return "0.1.9"
+                case _:
+                    return None
+        case "rustup":
+            match tag:
+                case "0.3.0" \
+                    | "0.3.1" \
+                    | "0.3.2" \
+                    | "0.3.3" \
+                    | "0.3.4" \
+                    | "0.3.5" \
+                    | "0.4.0-beta.1" \
+                    | "0.4.0-beta.2" \
+                    | "0.4.0-beta.3":
+                    return "1.24.3"
+                case "0.4.0-beta.4" \
+                    | "0.4.0-beta.5" \
+                    | "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "1.25.1"
+                case _:
+                    return None
+        case "rust":
+            match tag:
+                case "0.3.0" | "0.3.1" | "0.3.2":
+                    return "1.57.0"
+                case "0.3.3":
+                    return "1.58.1"
+                case "0.3.4" | "0.3.5":
+                    return "1.60.0"
+                case "0.4.0-beta.1" | "0.4.0-beta.2":
+                    return "1.61.0"
+                case "0.4.0-beta.3" | "0.4.0-beta.4" | "0.4.0-beta.5":
+                    return "1.62.0"
+                case "0.4.0-beta.6" | "0.4.0-beta.7":
+                    return "1.63.0"
+                case _:
+                    return None
+        case "wasm-pack":
+            match tag:
+                case "0.3.0" \
+                    | "0.3.1" \
+                    | "0.3.2" \
+                    | "0.3.3" \
+                    | "0.3.4" \
+                    | "0.3.5" \
+                    | "0.4.0-beta.1":
+                    return "0.10.2"
+                case "0.4.0-beta.2" \
+                    | "0.4.0-beta.3" \
+                    | "0.4.0-beta.4" \
+                    | "0.4.0-beta.5" \
+                    | "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "0.10.3"
+                case _:
+                    return None
+        case _:
+            return None
+
 perseus_version = "0.3.0"
 
 alpine_version = get_alpine_version(perseus_version)
 
-bonnie_version = "0.3.2"
-nvm_version = "0.39.1"
 rustup_target = "wasm32-unknown-unknown"
 
 PerseusRelease = namedtuple(
