@@ -1,7 +1,25 @@
 #!/usr/bin/env python3
 
 from collections import namedtuple
-from urllib import request
+from urllib import parse, request
+import re
+
+def get_alpine_version(tag):
+    match tag:
+        case "0.3.0" | "0.3.1" | "0.3.2" | "0.3.3" | "0.3.4" | "0.3.5":
+            return "3.15.6"
+        case _:
+            p = re.compile('^(0.[4-9]{1,}.*)$')
+            m = p.match(tag)
+            
+            if m is not None:
+                return "3.16.2"
+            else:
+                return None
+
+perseus_version = "0.3.0"
+
+alpine_version = get_alpine_version(perseus_version)
 
 bonnie_version = "0.3.2"
 nvm_version = "0.39.1"
