@@ -6,7 +6,12 @@ import re
 
 def get_alpine_version(tag):
     match tag:
-        case "0.3.0" | "0.3.1" | "0.3.2" | "0.3.3" | "0.3.4" | "0.3.5":
+        case "0.3.0" \
+            | "0.3.1" \
+            | "0.3.2" \
+            | "0.3.3" \
+            | "0.3.4" \
+            | "0.3.5":
             return "3.15.6"
         case _:
             p = re.compile('^0\.[4-9]{1,}.*$')
@@ -61,6 +66,43 @@ def get_granular_dependency_version(tag, dep):
                     return None
         case "bonnie":
             return "0.3.2"
+        case "browser-sync":
+            match tag:
+                case "0.3.0" | "0.3.1" | "0.3.2" | "0.3.3":
+                    return "2.27.7"
+                case "0.3.4":
+                    return "2.27.9"
+                case "0.3.5" \
+                    | "0.4.0-beta.1" \
+                    | "0.4.0-beta.2" \
+                    | "0.4.0-beta.3" \
+                    | "0.4.0-beta.4" \
+                    | "0.4.0-beta.5" \
+                    | "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "2.27.10"
+                case _:
+                    return None
+        case "concurrently":
+            match tag:
+                case "0.3.0":
+                    return "6.5.1"
+                case "0.3.1" | "0.3.2" | "0.3.3":
+                    return "7.0.0"
+                case "0.3.4" | "0.3.5":
+                    return "7.1.0"
+                case "0.4.0-beta.1":
+                    return "7.2.1"
+                case "0.4.0-beta.2":
+                    return "7.2.2"
+                case "0.4.0-beta.3" \
+                    | "0.4.0-beta.4" \
+                    | "0.4.0-beta.5" \
+                    | "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "7.3.0"
+                case _:
+                    return None
         case "esbuild":
             match tag:
                 case "0.3.0":
@@ -168,6 +210,51 @@ def get_granular_dependency_version(tag, dep):
                     return "1.62.0"
                 case "0.4.0-beta.6" | "0.4.0-beta.7":
                     return "1.63.0"
+                case _:
+                    return None
+        case "serve":
+            match tag:
+                case "0.3.0" \
+                    | "0.3.1" \
+                    | "0.3.2" \
+                    | "0.3.3" \
+                    | "0.3.4" \
+                    | "0.3.5" \
+                    | "0.4.0-beta.1" \
+                    | "0.4.0-beta.2" \
+                    | "0.4.0-beta.3":
+                    return "13.0.2"
+                case "0.4.0-beta.4":
+                    return "13.0.4"
+                case "0.4.0-beta.5" \
+                    | "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "14.0.1"
+                case _:
+                    return None
+        case "tailwindcss":
+            match tag:
+                case "0.3.0":
+                    return "3.0.7"
+                case "0.3.1":
+                    return "3.0.8"
+                case "0.3.2":
+                    return "3.0.12"
+                case "0.3.3":
+                    return "3.0.22"
+                case "0.3.4" \
+                    | "0.3.5" \
+                    | "0.4.0-beta.1":
+                    return "3.0.24"
+                case "0.4.0-beta.2" \
+                    | "0.4.0-beta.3":
+                    return "3.1.4"
+                case "0.4.0-beta.4" \
+                    | "0.4.0-beta.5":
+                    return "3.1.6"
+                case "0.4.0-beta.6" \
+                    | "0.4.0-beta.7":
+                    return "3.1.8"
                 case _:
                     return None
         case "wasm-pack":
