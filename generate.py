@@ -15,11 +15,16 @@ def get_alpine_version(tag):
             return "3.15.6"
         case _:
             p = re.compile('^0\.[4-9]{1,}.*$')
+            p = re.compile('^([0-9]{1,})\.([0-9]{1,})\.([0-9]{1,})$')
             m = p.match(tag)
             if m is not None:
-                return "3.16.2"
-            else:
+                major_v = int(m.group(1))
+                minor_v = int(m.group(2))
+                # patch_v = int(m.group(3))
+                if major_v == 0 and minor_v > 3:
+                    return "3.16.2"
                 return None
+            return None
 
 def get_alpine_pkg_string(tag, pkg):
     p = re.compile(
