@@ -14,7 +14,6 @@ def get_alpine_version(tag):
             | "0.3.5":
             return "3.15.6"
         case _:
-            p = re.compile('^0\.[4-9]{1,}.*$')
             p = re.compile('^([0-9]{1,})\.([0-9]{1,})\.([0-9]{1,})$')
             m = p.match(tag)
             if m is not None:
