@@ -50,6 +50,14 @@ def get_alpine_pkg_string(tag, pkg):
         case _:
             return None
 
+def get_alpine_pkgs(tag, pkg_name_arr):
+    output = []
+    for p in pkg_name_arr:
+        output.append(
+            get_alpine_pkg_string(tag, p)
+        )
+    return ' '.join(output)
+
 def get_granular_dependency_version(tag, dep):
     match dep:
         case "binaryen":
@@ -285,8 +293,18 @@ def get_granular_dependency_version(tag, dep):
             return None
 
 perseus_version = "0.3.0"
-
 alpine_version = get_alpine_version(perseus_version)
+alpine_packages = get_alpine_pkgs(
+    perseus_version,
+    [
+        "alpine-sdk",
+        "gawk",
+        "linux-headers",
+        "openrc",
+        "perl"
+    ]
+)
+
 
 rustup_target = "wasm32-unknown-unknown"
 
