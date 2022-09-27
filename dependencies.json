@@ -1,0 +1,185 @@
+{
+  "0.3.0": {
+    "dev-tools": {
+      "node": "17.3.0",
+      "npm": "8.3.0",
+      "nvm": "0.39.1",
+      "rust": "1.57.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.15.6",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "35",
+      "ubuntu": "18.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.7",
+      "concurrently": "6.5.1",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.7"
+    },
+    "remote-binaries": {
+      "binaryen": "104",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.6",
+      "perseus-size-opt": "0.1.7",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.3.1": {
+    "dev-tools": {
+      "node": "17.3.0",
+      "npm": "8.3.0",
+      "nvm": "0.39.1",
+      "rust": "1.57.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.15.6",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "35",
+      "ubuntu": "18.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.7",
+      "concurrently": "7.0.0",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.8"
+    },
+    "remote_binaries": {
+      "binaryen": "104",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.10",
+      "perseus-size-opt": "0.1.7",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.3.2": {
+    "dev-tools": {
+      "node": "17.3.1",
+      "npm": "8.3.0",
+      "nvm": "0.39.1",
+      "rust": "1.57.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.15.6",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "35",
+      "ubuntu": "18.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.7",
+      "concurrently": "7.0.0",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.12"
+    },
+    "remote-binaries": {
+      "binaryen": "104",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.11",
+      "perseus-size-opt": "0.1.7",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.3.3": {
+    "dev-tools": {
+      "node": "17.5.0",
+      "npm": "8.4.1",
+      "nvm": "0.39.1",
+      "rust": "1.58.1",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.15.6",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "35",
+      "ubuntu": "18.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.7",
+      "concurrently": "7.0.0",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.22"
+    },
+    "remote-binaries": {
+      "binaryen": "105",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.21",
+      "perseus-size-opt": "0.1.7",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.3.4": {
+    "dev-tools": {
+      "node": "18.0.0",
+      "npm": "8.6.0",
+      "nvm": "0.39.1",
+      "rust": "1.60.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.15.6",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "35",
+      "ubuntu": "20.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.9",
+      "concurrently": "7.1.0",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.24"
+    },
+    "remote-binaries": {
+      "binaryen": "105",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.36",
+      "perseus-size-opt": "0.1.8",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.3.5": {
+    "dev-tools": {
+      "node": "18.0.0",
+      "npm": "8.6.0",
+      "nvm": "0.39.1",
+      "rust": "1.60.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.15.6",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "35",
+      "ubuntu": "20.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.1.0",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.24"
+    },
+    "remote-binaries": {
+      "binaryen": "105",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.36",
+      "perseus-size-opt": "0.1.9",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.4.0-beta.1": {},
+  "0.4.0-beta.2": {},
+  "0.4.0-beta.3": {},
+  "0.4.0-beta.4": {},
+  "0.4.0-beta.5": {},
+  "0.4.0-beta.6": {},
+  "0.4.0-beta.7": {},
+  "0.4.0-beta.8": {},
+  "0.4.0-beta.9": {}
+}
