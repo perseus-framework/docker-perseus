@@ -1,0 +1,9 @@
+{
+  "apt-transport-https": "2.4.5",
+  "build-essenial": "12.9ubuntu3",
+  "curl": "7.81.0-1ubuntu1.3",
+  "gawk": "1:5.1.0-1build3",
+  "lsb-release": "11.1.0ubuntu4",
+  "openssl": "TODO: 1.1.1q must be installed manually",
+  "pkg-config": "0.29.2-1ubuntu3"
+}

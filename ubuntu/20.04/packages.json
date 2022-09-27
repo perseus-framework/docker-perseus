@@ -1,0 +1,9 @@
+{
+  "apt-transport-https": "2.0.9",
+  "build-essenial": "12.8ubuntu1",
+  "curl": "7.68.0-1ubuntu2.12",
+  "gawk": "1:5.0.1+dfsg-1",
+  "lsb-release": "11.1.0ubuntu2",
+  "openssl": "1.1.1f-1ubuntu2.16",
+  "pkg-config": "0.29.1-0ubuntu4"
+}
