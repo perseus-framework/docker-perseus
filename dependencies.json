@@ -173,13 +173,187 @@
       "wasm-pack": "0.10.2"
     }
   },
-  "0.4.0-beta.1": {},
-  "0.4.0-beta.2": {},
-  "0.4.0-beta.3": {},
-  "0.4.0-beta.4": {},
-  "0.4.0-beta.5": {},
-  "0.4.0-beta.6": {},
-  "0.4.0-beta.7": {},
-  "0.4.0-beta.8": {},
-  "0.4.0-beta.9": {}
+  "0.3.6": {
+    "this_section": "requires research of dependency versions"
+  },
+  "0.4.0-beta.1": {
+    "dev-tools": {
+      "node": "18.2.0",
+      "npm": "8.9.0",
+      "nvm": "0.39.1",
+      "rust": "1.61.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.16.2",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "36",
+      "ubuntu": "22.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.2.1",
+      "serve": "13.0.2",
+      "tailwindcss": "3.0.24"
+    },
+    "remote-binaries": {
+      "binaryen": "108",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.42",
+      "wasm-pack": "0.10.2"
+    }
+  },
+  "0.4.0-beta.2": {
+    "dev-tools": {
+      "node": "18.4.0",
+      "npm": "8.12.1",
+      "nvm": "0.39.1",
+      "rust": "1.61.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.16.2",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "36",
+      "ubuntu": "22.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.2.2",
+      "serve": "13.0.2",
+      "tailwindcss": "3.1.4"
+    },
+    "remote-binaries": {
+      "binaryen": "109",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.47",
+      "wasm-pack": "0.10.3"
+    }
+  },
+  "0.4.0-beta.3": {
+    "dev-tools": {
+      "node": "18.4.0",
+      "npm": "8.12.1",
+      "nvm": "0.39.1",
+      "rust": "1.62.0",
+      "rustup": "1.24.3"
+    },
+    "distributions": {
+      "alpine": "3.16.2",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "36",
+      "ubuntu": "22.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.3.0",
+      "serve": "13.0.2",
+      "tailwindcss": "3.1.4"
+    },
+    "remote-binaries": {
+      "binaryen": "109",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.48",
+      "wasm-pack": "0.10.3"
+    }
+  },
+  "0.4.0-beta.4": {
+    "dev-tools": {
+      "node": "18.6.0",
+      "npm": "8.13.2",
+      "nvm": "0.39.1",
+      "rust": "1.62.0",
+      "rustup": "1.25.1"
+    },
+    "distributions": {
+      "alpine": "3.16.2",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "36",
+      "ubuntu": "22.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.3.0",
+      "serve": "13.0.4",
+      "tailwindcss": "3.1.6"
+    },
+    "remote-binaries": {
+      "binaryen": "109",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.49",
+      "wasm-pack": "0.10.3"
+    }
+  },
+  "0.4.0-beta.5": {
+    "dev-tools": {
+      "node": "18.6.0",
+      "npm": "8.13.2",
+      "nvm": "0.39.1",
+      "rust": "1.62.0",
+      "rustup": "1.25.1"
+    },
+    "distributions": {
+      "alpine": "3.16.2",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "36",
+      "ubuntu": "22.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.3.0",
+      "serve": "14.0.1",
+      "tailwindcss": "3.1.6"
+    },
+    "remote-binaries": {
+      "binaryen": "109",
+      "bonnie": "0.3.2",
+      "esbuild": "0.14.49",
+      "wasm-pack": "0.10.3"
+    }
+  },
+  "0.4.0-beta.6": {
+    "dev-tools": {
+      "node": "18.7.0",
+      "npm": "8.15.0",
+      "nvm": "0.39.1",
+      "rust": "1.63.0",
+      "rustup": "1.25.1"
+    },
+    "distributions": {
+      "alpine": "3.16.2",
+      "centos": "7.9.2009",
+      "debian": "11-slim",
+      "fedora": "36",
+      "ubuntu": "22.04"
+    },
+    "node-packages": {
+      "browser-sync": "2.27.10",
+      "concurrently": "7.3.0",
+      "serve": "14.0.1",
+      "tailwindcss": "3.1.8"
+    },
+    "remote-binaries": {
+      "binaryen": "109",
+      "bonnie": "0.3.2",
+      "esbuild": "0.15.3",
+      "wasm-pack": "0.10.3"
+    }
+  },
+  "0.4.0-beta.7": {
+    "this_section": "requires research of dependency versions"
+  },
+  "0.4.0-beta.8": {
+    "this_section": "requires research of dependency versions"
+  },
+  "0.4.0-beta.9": {
+    "this_section": "requires research of dependency versions"
+  },
+  "0.4.0-beta.10": {
+    "this_section": "requires research of dependency versions"
+  }
 }
