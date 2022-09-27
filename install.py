@@ -1,8 +1,38 @@
 #!/usr/bin/env python3
 
 from collections import namedtuple
-from urllib import parse, request
+from types import SimpleNamespace
+from urllib import request #, parse
 import re
+import platform
+import sys
+
+# Installer is platform agnostic and must cover all edge cases.
+def is_linux():
+    match sys.platform:
+        case 'linux':
+            return True
+        case _:
+            return False
+
+def get_local_platform():
+    try:
+        output = SimpleNamespace(
+            os=SimpleNamespace(
+                **{
+                    k.lower(): v for k, v in platform \
+                        .freedesktop_os_release() \
+                        .items()
+                }
+            ),
+            arch=platform.machine()
+        )
+        return output
+    except OSError as err:
+        print(f"OS Error: {err}")
+    except BaseException as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
 
 def get_alpine_version(tag):
     match tag:
