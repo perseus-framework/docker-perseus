@@ -4,5 +4,6 @@
   "curl": "7.68.0-1ubuntu2.12",
   "gawk": "1:5.0.1+dfsg-1",
   "openssl": "TODO: 1.1.1q must be installed manually.",
-  "pkg-config": "0.29.1-0ubuntu4"
+  "pkg-config": "0.29.1-0ubuntu4",
+  "python3": "3.8.2-0ubuntu2"
 }

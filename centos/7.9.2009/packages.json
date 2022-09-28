@@ -3,5 +3,6 @@
   "curl": "7.29.0-59.el7",
   "gawk": "4.0.2-4.el7_3.1",
   "openssl-devel": "TODO: 1.1.1q must be installed manually.",
-  "pkgconfig": "0.27.1-4.el7"
+  "pkgconfig": "0.27.1-4.el7",
+  "python3": "3.6.8-18.el7"
 }
