@@ -2,8 +2,7 @@
   "build-essential": "no equivalent, must collect needed dep info manually.",
   "curl-minimal": "7.78.0-3.fc35",
   "gawk": "5.1.0-4.fc35",
-  "openssl1.1-devel": "1.1.1q-1.fc35",
+  "openssl1.1-devel": "TODO: 1.1.1q must be installed manually.",
   "pkgconf": "1.8.0-1.fc35",
-  "pkgconf-pkg-config": "1.8.0-1.fc35",
-  "redhat-lsb-core": "4.1-55.fc35"
+  "pkgconf-pkg-config": "1.8.0-1.fc35"
 }
