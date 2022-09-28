@@ -2,7 +2,6 @@
   "build-essential": "no equivalent, must collect needed dep info manually.",
   "curl-minimal": "7.82.0-2.fc36",
   "gawk": "5.1.1-2.fc36",
-  "openssl1.1-devel": "TODO: 1.1.1q must be installed manually.",
   "pkgconf": "1.8.0-2.fc36",
   "pkgconf-pkg-config": "1.8.0-2.fc36",
   "python3": "3.10.7-1.fc36"

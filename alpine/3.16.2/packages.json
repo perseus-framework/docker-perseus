@@ -3,7 +3,6 @@
   "gawk": "5.1.1-r0",
   "linux-headers": "5.16.7-r1",
   "openrc": "0.44.10-r7",
-  "openssl": "TODO: 1.1.1q must be installed manually.",
   "perl": "5.34.1-r0",
   "pkgconf": "1.8.0-r1",
   "python3": "3.10.5-r0"

@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 from types import SimpleNamespace
-from urllib import request #, parse
+from urllib import request, urlretrieve #, parse
 import re
 import platform
 import sys

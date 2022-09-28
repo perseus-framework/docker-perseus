@@ -24,6 +24,7 @@
       "binaryen": "104",
       "bonnie": "0.3.2",
       "esbuild": "0.14.6",
+      "openssl": "1.1.1m",
       "perseus-size-opt": "0.1.7",
       "wasm-pack": "0.10.2"
     }
@@ -53,6 +54,7 @@
       "binaryen": "104",
       "bonnie": "0.3.2",
       "esbuild": "0.14.10",
+      "openssl": "1.1.1m",
       "perseus-size-opt": "0.1.7",
       "wasm-pack": "0.10.2"
     }
@@ -82,6 +84,7 @@
       "binaryen": "104",
       "bonnie": "0.3.2",
       "esbuild": "0.14.11",
+      "openssl": "1.1.1n",
       "perseus-size-opt": "0.1.7",
       "wasm-pack": "0.10.2"
     }
@@ -111,6 +114,7 @@
       "binaryen": "105",
       "bonnie": "0.3.2",
       "esbuild": "0.14.21",
+      "openssl": "1.1.1n",
       "perseus-size-opt": "0.1.7",
       "wasm-pack": "0.10.2"
     }
@@ -140,6 +144,7 @@
       "binaryen": "105",
       "bonnie": "0.3.2",
       "esbuild": "0.14.36",
+      "openssl": "1.1.1n",
       "perseus-size-opt": "0.1.8",
       "wasm-pack": "0.10.2"
     }
@@ -169,6 +174,7 @@
       "binaryen": "105",
       "bonnie": "0.3.2",
       "esbuild": "0.14.36",
+      "openssl": "1.1.1n",
       "perseus-size-opt": "0.1.9",
       "wasm-pack": "0.10.2"
     }
@@ -201,6 +207,7 @@
       "binaryen": "108",
       "bonnie": "0.3.2",
       "esbuild": "0.14.42",
+      "openssl": "1.1.1o",
       "wasm-pack": "0.10.2"
     }
   },
@@ -229,6 +236,7 @@
       "binaryen": "109",
       "bonnie": "0.3.2",
       "esbuild": "0.14.47",
+      "openssl": "1.1.1p",
       "wasm-pack": "0.10.3"
     }
   },
@@ -257,6 +265,7 @@
       "binaryen": "109",
       "bonnie": "0.3.2",
       "esbuild": "0.14.48",
+      "openssl": "1.1.1p",
       "wasm-pack": "0.10.3"
     }
   },
@@ -285,6 +294,7 @@
       "binaryen": "109",
       "bonnie": "0.3.2",
       "esbuild": "0.14.49",
+      "openssl": "1.1.1q",
       "wasm-pack": "0.10.3"
     }
   },
@@ -313,6 +323,7 @@
       "binaryen": "109",
       "bonnie": "0.3.2",
       "esbuild": "0.14.49",
+      "openssl": "1.1.1q",
       "wasm-pack": "0.10.3"
     }
   },
@@ -341,6 +352,7 @@
       "binaryen": "109",
       "bonnie": "0.3.2",
       "esbuild": "0.15.3",
+      "openssl": "1.1.1q",
       "wasm-pack": "0.10.3"
     }
   },
