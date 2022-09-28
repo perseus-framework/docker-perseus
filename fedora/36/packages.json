@@ -2,6 +2,7 @@
   "build-essential": "no equivalent, must collect needed dep info manually.",
   "curl-minimal": "7.82.0-2.fc36",
   "gawk": "5.1.1-2.fc36",
+  "perl": "5.34.1-486.fc36",
   "pkgconf": "1.8.0-2.fc36",
   "python3": "3.10.7-1.fc36"
 }

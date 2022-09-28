@@ -1,5 +1,6 @@
 {
   "alpine-sdk": "1.0-r1",
+  "curl": "7.83.1-r3",
   "gawk": "5.1.1-r0",
   "linux-headers": "5.16.7-r1",
   "openrc": "0.44.10-r7",

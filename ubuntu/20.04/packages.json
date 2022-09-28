@@ -3,6 +3,7 @@
   "build-essenial": "12.8ubuntu1",
   "curl": "7.68.0-1ubuntu2.12",
   "gawk": "1:5.0.1+dfsg-1",
+  "perl": "5.30.0-9ubuntu0.2",
   "pkg-config": "0.29.1-0ubuntu4",
   "python3": "3.8.2-0ubuntu2"
 }

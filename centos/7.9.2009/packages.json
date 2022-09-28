@@ -2,6 +2,7 @@
   "build-essential": "no equivalent, must collect needed dep info manually.",
   "curl": "7.29.0-59.el7",
   "gawk": "4.0.2-4.el7_3.1",
+  "perl": "5.16.3-299.el7_9",
   "pkgconfig": "0.27.1-4.el7",
   "python3": "3.6.8-18.el7"
 }
