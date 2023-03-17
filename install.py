@@ -2,22 +2,28 @@
 
 from collections import namedtuple
 from types import SimpleNamespace
-from urllib import request, urlretrieve #, parse
-import re
+from urllib import request
+import tarfile
 import platform
+import subprocess
 import sys
+import re
+import os
+import json
 
-# Installer is platform agnostic and must cover all edge cases.
-def is_linux():
+# Check whether or not the host is running Linux.
+# We cannot proceed unless we are on a Linux host.
+def os_is_linux():
     match sys.platform:
         case 'linux':
             return True
         case _:
             return False
 
+# Retrieve data about the platform of the host.
 def get_local_platform():
     try:
-        output = SimpleNamespace(
+        platform_data = SimpleNamespace(
             os=SimpleNamespace(
                 **{
                     k.lower(): v for k, v in platform \
@@ -27,12 +33,68 @@ def get_local_platform():
             ),
             arch=platform.machine()
         )
-        return output
+        return platform_data
     except OSError as err:
         print(f"OS Error: {err}")
     except BaseException as err:
         print(f"Unexpected {err=}, {type(err)=}")
         raise
+
+def get_perseus_version():
+    return os.getenv('PERSEUS_VERSION')
+
+# Each parallel job inside of the Dockerfile will use its own script(s).
+# There will be no single source of truth throughout all stages of the build.
+
+def initialize_container():
+    if os_is_linux() == True:
+        local_platform = get_local_platform()
+        perseus_version = get_perseus_version()
+        deps = json.load(
+            open(
+                'dependencies.json',
+                mode='r',
+                encoding='utf-8',
+                errors='strict'
+            )
+        )
+        data = deps[f"{perseus_version}"]
+        data[f"{local_platform}"]
+        # Get perseus version.
+        # Use perseus and platform data to parse JSON file.
+        # Generate strings from parsed JSON.
+        # Run subprocess command.
+        subprocess.run(
+            [
+                f""
+            ]
+        )
+    return None
+
+# Tarball downloader.
+def download_tarball(remote_url, local_path):
+    try:
+        tgz = tarfile.open(
+            fileobj=request.urlopen(remote_url),
+            mode="r|gz"
+        )
+        tgz.extractall(path=local_path)
+    except request.HTTPError as err:
+        print(f"HTTP Error: {err}")
+    except tarfile.ReadError as err:
+        print(f"File Read Error: {err}")
+    except tarfile.CompressionError as err:
+        print(f"File Compression Error: {err}")
+    except tarfile.StreamError as err:
+        print(f"File Stream Error: {err}")
+    except OSError as err:
+        print(f"OS Error: {err}")
+    except BaseException as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
+
+# extract tarball to /openssl.
+# build openssl using subprocess.
 
 def get_alpine_version(tag):
     match tag:
@@ -44,11 +106,13 @@ def get_alpine_version(tag):
             | "0.3.5":
             return "3.15.6"
         case _:
-            p = re.compile('^([0-9]{1,})\.([0-9]{1,})\.([0-9]{1,})$')
-            m = p.match(tag)
-            if m is not None:
-                major_v = int(m.group(1))
-                minor_v = int(m.group(2))
+            regex_pattern = re.compile(
+                '^([0-9]{1,})\.([0-9]{1,})\.([0-9]{1,})$'
+            )
+            regex_match = regex_pattern.match(tag)
+            if regex_match is not None:
+                major_v = int(regex_match.group(1))
+                minor_v = int(regex_match.group(2))
                 # patch_v = int(m.group(3))
                 if major_v == 0 and minor_v > 3:
                     return "3.16.2"
@@ -56,7 +120,7 @@ def get_alpine_version(tag):
             return None
 
 def get_alpine_pkg_string(tag, pkg):
-    p = re.compile(
+    regex_pattern = re.compile(
         '.* pkgname=([^ ]{1,}).* pkgver=([^ ]{1,}).* pkgrel=([^ ]{1,}) .*'
     )
     match tag:
@@ -67,11 +131,11 @@ def get_alpine_pkg_string(tag, pkg):
                 pkg_data = response.read()\
                                     .decode('UTF-8')\
                                     .replace('\n', ' ')
-                m = p.search(pkg_data)
-                if m is not None:
-                    pkg_name = m.group(1)
-                    pkg_ver = m.group(2)
-                    pkg_rel = m.group(3)
+                regex_match = regex_pattern.search(pkg_data)
+                if regex_match is not None:
+                    pkg_name = regex_match.group(1)
+                    pkg_ver = regex_match.group(2)
+                    pkg_rel = regex_match.group(3)
                     if pkg_name == pkg:
                         return f'{pkg_name}={pkg_ver}-r{pkg_rel}'
                 else:
@@ -81,9 +145,9 @@ def get_alpine_pkg_string(tag, pkg):
 
 def get_alpine_pkgs(tag, pkg_name_arr):
     output = []
-    for p in pkg_name_arr:
+    for pkg in pkg_name_arr:
         output.append(
-            get_alpine_pkg_string(tag, p)
+            get_alpine_pkg_string(tag, pkg)
         )
     return ' '.join(output)
 
