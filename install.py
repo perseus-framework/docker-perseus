@@ -20,23 +20,17 @@ def os_is_linux():
 
 # Retrieve data about the platform of the host.
 def get_local_platform():
-    try:
-        platform_data = SimpleNamespace(
-            os=SimpleNamespace(
-                **{
-                    k.lower(): v for k, v in platform \
-                        .freedesktop_os_release() \
-                        .items()
-                }
-            ),
-            arch=platform.machine()
-        )
-        return platform_data
-    except OSError as err:
-        print(f"OS Error: {err}")
-    except BaseException as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-        raise
+    platform_data = SimpleNamespace(
+        os=SimpleNamespace(
+            **{
+                k.lower(): v for k, v in platform \
+                    .freedesktop_os_release() \
+                    .items()
+            }
+        ),
+        arch=platform.machine()
+    )
+    return platform_data
 
 def get_perseus_version():
     return os.getenv('PERSEUS_VERSION')
