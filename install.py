@@ -14,11 +14,9 @@ import json
 # Check whether or not the host is running Linux.
 # We cannot proceed unless we are on a Linux host.
 def os_is_linux():
-    match sys.platform:
-        case 'linux':
-            return True
-        case _:
-            return False
+    if sys.platform.startswith('linux'):
+        return True
+    return False
 
 # Retrieve data about the platform of the host.
 def get_local_platform():
