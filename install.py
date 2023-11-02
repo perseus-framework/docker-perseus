@@ -239,7 +239,10 @@ def get_rocky_package_version(rocky_release, pkg):
         api_dir
     )
     pkg_data = ' '.join(
-        get_data(data_url='{0}'.format(pkg_url), content_type=None).splitlines()
+        get_data(
+            data_url='{0}'.format(pkg_url),
+            content_type=None
+        ).splitlines()
     )
     pkg_version_string = re.search(
         ''.join([
