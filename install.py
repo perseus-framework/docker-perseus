@@ -283,8 +283,9 @@ def get_ubuntu_package_version(distro_series, pkg):
 def generate_template(distro, template_path):
     print('to be completed.')
 
-def build_directories():
-    root_path='./{0}'.format(get_perseus_tags()[0])
+def generate_dirs():
+    perseus_latest = get_perseus_latest_tag()
+    root_path='./{0}'.format(perseus_latest)
     if not os.path.exists(root_path):
         distributions = [
             'alpine{0}'.format(get_latest_distribution(ALPINE_URL)),
