@@ -276,7 +276,7 @@ def get_ubuntu_package_version(distro_series, pkg):
     )
     return pkg_version_string
 
-def generate_templates():
+def generate_template(distro, template_path):
     print('to be completed.')
 
 def build_directories():
@@ -291,7 +291,9 @@ def build_directories():
         ]
 
         for distro in distributions:
-            os.makedirs('{0}/{1}'.format(root_path, distro))
+            template_path = '{0}/{1}'.format(root_path, distro)
+            os.makedirs(template_path)
+            generate_template(distro, template_path)
 
 # Retrieve the target os of the build from the local environment.
 def get_os_name():
