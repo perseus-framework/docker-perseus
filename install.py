@@ -133,6 +133,10 @@ def get_perseus_tags():
         tags.append(version_tag)
     return tags
 
+def get_perseus_latest_tag():
+    tags = get_perseus_tags()
+    return tags[0]
+
 def get_latest_distribution(linux_url):
     linux_name = re.search(
         '(?<=repositories/)[a-z]{1,}',
