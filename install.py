@@ -286,34 +286,34 @@ def generate_docker_files():
     root_path='./{0}'.format(perseus_latest)
     if not os.path.exists(root_path):
         generate_directory(root_path)
-        BuildTarget = namedtuple('BuildTarget', ['os', 'path', 'tag'])
+        TargetOS = namedtuple('TargetOS', ['os', 'path', 'tag'])
         alpine_latest = get_latest_distribution(ALPINE_URL)
         debian_latest = get_latest_distribution(DEBIAN_URL)
         fedora_latest = get_latest_distribution(FEDORA_URL)
         rocky_latest = get_latest_distribution(ROCKY_URL)
         ubuntu_latest = get_latest_distribution(UBUNTU_URL)
         targets = [
-            BuildTarget(
+            TargetOS(
                 os='alpine',
                 path='alpine{0}'.format(alpine_latest),
                 tag='alpine:{0}'.format(alpine_latest)
             ),
-            BuildTarget(
+            TargetOS(
                 os='debian',
                 path='debian{0}'.format(debian_latest),
                 tag='debian:{0}'.format(debian_latest)
             ),
-            BuildTarget(
+            TargetOS(
                 os='fedora',
                 path='fedora{0}'.format(fedora_latest),
                 tag='fedora:{0}'.format(fedora_latest)
             ),
-            BuildTarget(
+            TargetOS(
                 os='rocky',
                 path='rocky{0}'.format(rocky_latest),
                 tag='rocky:{0}'.format(rocky_latest)
             ),
-            BuildTarget(
+            TargetOS(
                 os='ubuntu',
                 path='ubuntu{0}'.format(ubuntu_latest),
                 tag='ubuntu:{0}'.format(ubuntu_latest)
