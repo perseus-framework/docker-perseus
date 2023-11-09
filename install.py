@@ -50,12 +50,6 @@ ROCKY_PKG_URL=[
     '/BaseOS/source/tree/Packages/'
 ]
 
-# We have to parse the data after it comes in.
-# Unfortunately we can't scope down to a specific release channel.
-
-# YAY!!! I finally scoped down to the precise version I need!!!
-# curl -H 'Content-Type: "application/json"' -sSL 'https://api.launchpad.net/1.0/ubuntu/+archive/primary?ws.op=getPublishedSources&date_superceded=null&exact_match=true&pocket=Updates&status=Published&source_name=curl&distro_series=https%3A%2F%2Fapi.launchpad.net%2F1.0%2Fubuntu%2Fjammy' | jq
-
 UBUNTU_PKG_URL=[
     'https://api.launchpad.net/1.0/ubuntu/+archive/primary',
     '?ws.op=getPublishedSources',
@@ -299,6 +293,9 @@ def generate_dirs():
             template_path = '{0}/{1}'.format(root_path, distro)
             os.makedirs(template_path)
             generate_template(distro, template_path)
+
+def generate_docker_files():
+    print('to be completed.')
 
 # Retrieve the target os of the build from the local environment.
 def get_os_name():
