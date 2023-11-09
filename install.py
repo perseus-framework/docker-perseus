@@ -274,28 +274,55 @@ def get_ubuntu_package_version(distro_series, pkg):
     )
     return pkg_version_string
 
-def generate_template(distro, template_path):
+def generate_template(target):
     print('to be completed.')
 
-def generate_dirs():
+def generate_directory(dir_path):
+    dir_path = '{0}'.format(dir_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+def generate_docker_files():
     perseus_latest = get_perseus_latest_tag()
     root_path='./{0}'.format(perseus_latest)
     if not os.path.exists(root_path):
-        distributions = [
-            'alpine{0}'.format(get_latest_distribution(ALPINE_URL)),
-            'debian{0}'.format(get_latest_distribution(DEBIAN_URL)),
-            'fedora{0}'.format(get_latest_distribution(FEDORA_URL)),
-            'rocky{0}'.format(get_latest_distribution(ROCKY_URL)),
-            'ubuntu{0}'.format(get_latest_distribution(UBUNTU_URL))
+        generate_directory(root_path)
+        BuildTarget = namedtuple('BuildTarget', ['os', 'path', 'tag'])
+        alpine_latest = get_latest_distribution(ALPINE_URL)
+        debian_latest = get_latest_distribution(DEBIAN_URL)
+        fedora_latest = get_latest_distribution(FEDORA_URL)
+        rocky_latest = get_latest_distribution(ROCKY_URL)
+        ubuntu_latest = get_latest_distribution(UBUNTU_URL)
+        targets = [
+            BuildTarget(
+                os='alpine',
+                path='alpine{0}'.format(alpine_latest),
+                tag='alpine:{0}'.format(alpine_latest)
+            ),
+            BuildTarget(
+                os='debian',
+                path='debian{0}'.format(debian_latest),
+                tag='debian:{0}'.format(debian_latest)
+            ),
+            BuildTarget(
+                os='fedora',
+                path='fedora{0}'.format(fedora_latest),
+                tag='fedora:{0}'.format(fedora_latest)
+            ),
+            BuildTarget(
+                os='rocky',
+                path='rocky{0}'.format(rocky_latest),
+                tag='rocky:{0}'.format(rocky_latest)
+            ),
+            BuildTarget(
+                os='ubuntu',
+                path='ubuntu{0}'.format(ubuntu_latest),
+                tag='ubuntu:{0}'.format(ubuntu_latest)
+            )
         ]
-
-        for distro in distributions:
-            template_path = '{0}/{1}'.format(root_path, distro)
-            os.makedirs(template_path)
-            generate_template(distro, template_path)
-
-def generate_docker_files():
-    print('to be completed.')
+        for target in targets:
+            generate_directory(target.path)
+            generate_template(target)
 
 # Retrieve the target os of the build from the local environment.
 def get_os_name():
