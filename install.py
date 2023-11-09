@@ -131,6 +131,18 @@ def get_perseus_latest_tag():
     tags = get_perseus_tags()
     return tags[0]
 
+def get_binaryen_tags():
+    print('to be completed.')
+
+def get_bonnie_tags():
+    print('to be completed.')
+
+def get_esbuild_tags():
+    print('to be completed.')
+
+def get_wasm_pack_tags():
+    print('to be completed.')
+          
 def get_latest_distribution(linux_url):
     linux_name = re.search(
         '(?<=repositories/)[a-z]{1,}',
