@@ -275,7 +275,23 @@ def get_ubuntu_package_version(distro_series, pkg):
     return pkg_version_string
 
 def generate_template(target):
-    print('to be completed.')
+    file_path = '{0}/Dockerfile'.format(target.path)
+    f = open(file=file_path, mode='w')
+    dockerfile_contents = [
+        'FROM {0} AS base\n'.format(target.tag),
+        '\n',
+        'ARG EXAMPLE_NAME \\\n',
+        '\tPERSEUS_VERSION \\\n',
+        '\tBINARYEN_VERSION \\\n',
+        '\tBONNIE_VERSION \\\n',
+        '\tESBUILD_VERSION \\\n',
+        '\tESBUILD_TARGET \\\n',
+        '\tWASM_PACK_VERSION \\\n',
+        '\tWASM_TARGET \\\n',
+        '\tCARGO_NET_GIT_FETCH_WITH_CLI \\\n',
+        '\n'
+    ]
+    f.writelines(dockerfile_contents)
 
 def generate_directory(dir_path):
     if not os.path.exists(dir_path):
