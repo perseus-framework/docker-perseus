@@ -289,7 +289,15 @@ def generate_template(target):
         '\tWASM_PACK_VERSION \\\n',
         '\tWASM_TARGET \\\n',
         '\tCARGO_NET_GIT_FETCH_WITH_CLI \\\n',
-        '\n'
+        '\n',
+        'ENV EXAMPLE_NAME=\"${EXAMPLE_NAME\:-showcase}\" \\\n',
+        ''.join(
+            [
+                '\tPERSEUS_VERSION="${',
+                '{0}'.format(get_perseus_latest_tag()),
+                '}" \\\n'
+            ]
+        )
     ]
     f.writelines(dockerfile_contents)
 
