@@ -132,15 +132,19 @@ def get_perseus_latest_tag():
     return tags[0]
 
 def get_binaryen_tags():
+    # URL: https://api.github.com/repos/WebAssembly/binaryen/releases
     print('to be completed.')
 
 def get_bonnie_tags():
+    # URL: https://api.github.com/repos/arctic-hen7/bonnie/releases
     print('to be completed.')
 
 def get_esbuild_tags():
+    # URL: https://api.github.com/repos/evanw/esbuild/releases
     print('to be completed.')
 
 def get_wasm_pack_tags():
+    # URL: https://api.github.com/repos/rustwasm/wasm-pack/releases
     print('to be completed.')
           
 def get_latest_distribution(linux_url):
