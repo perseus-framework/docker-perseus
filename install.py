@@ -22,6 +22,12 @@ GH_RAW_URL='https://raw.githubusercontent.com/'
 PERSEUS_URL='{0}framesurge/perseus/releases'.format(GH_API_URL)
 RUST_URL='{0}rust-lang/rust/releases'.format(GH_API_URL)
 
+# URLs for binary dependencies of Perseus.
+BINARYEN_URL='{0}WebAssembly/binaryen/releases'.format(GH_API_URL)
+BONNIE_URL='{0}arctic-hen7/bonnie/releases'.format(GH_API_URL)
+ESBUILD_URL='{0}evanw/esbuild/releases'.format(GH_API_URL)
+WASM_PACK_URL='{0}rustwasm/wasm-pack/releases'.format(GH_API_URL)
+
 # URL for the Docker Hub official image registry.
 HUB_URL='https://hub.docker.com/v2/namespaces/library/repositories/'
 
@@ -132,20 +138,68 @@ def get_perseus_latest_tag():
     return tags[0]
 
 def get_binaryen_tags():
-    # URL: https://api.github.com/repos/WebAssembly/binaryen/releases
-    print('to be completed.')
+    binaryen_json = get_data(
+        data_url='{0}'.format(BINARYEN_URL),
+        content_type='application/json'
+    )
+    binaryen_namespace = json_to_namespace(binaryen_json)
+    tags = []
+    for binaryen_release in enumerate(binaryen_namespace):
+        version_tag = binaryen_release[1].tag_name
+        tags.append(version_tag)
+    return tags
+
+def get_binaryen_latest_tag():
+    tags = get_binaryen_tags()
+    return tags[0]
 
 def get_bonnie_tags():
-    # URL: https://api.github.com/repos/arctic-hen7/bonnie/releases
-    print('to be completed.')
+    bonnie_json = get_data(
+        data_url='{0}'.format(BONNIE_URL),
+        content_type='application/json'
+    )
+    bonnie_namespace = json_to_namespace(bonnie_json)
+    tags = []
+    for bonnie_release in enumerate(bonnie_namespace):
+        version_tag = bonnie_release[1].tag_name
+        tags.append(version_tag)
+    return tags
+
+def get_bonnie_latest_tag():
+    tags = get_bonnie_tags()
+    return tags[0]
 
 def get_esbuild_tags():
-    # URL: https://api.github.com/repos/evanw/esbuild/releases
-    print('to be completed.')
+    esbuild_json = get_data(
+        data_url='{0}'.format(ESBUILD_URL),
+        content_type='application/json'
+    )
+    esbuild_namespace = json_to_namespace(esbuild_json)
+    tags = []
+    for esbuild_release in enumerate(esbuild_namespace):
+        version_tag = esbuild_release[1].tag_name
+        tags.append(version_tag)
+    return tags
+
+def get_esbuild_latest_tag():
+    tags = get_esbuild_tags()
+    return tags[0]
 
 def get_wasm_pack_tags():
-    # URL: https://api.github.com/repos/rustwasm/wasm-pack/releases
-    print('to be completed.')
+    wasm_pack_json = get_data(
+        data_url='{0}'.format(WASM_PACK_URL),
+        content_type='application/json'
+    )
+    wasm_pack_namespace = json_to_namespace(wasm_pack_json)
+    tags = []
+    for wasm_pack_release in enumerate(wasm_pack_namespace):
+        version_tag = wasm_pack_release[1].tag_name
+        tags.append(version_tag)
+    return tags
+
+def get_wasm_pack_latest_tag():
+    tags = get_wasm_pack_tags()
+    return tags[0]
           
 def get_latest_distribution(linux_url):
     linux_name = re.search(
