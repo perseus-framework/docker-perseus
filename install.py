@@ -425,262 +425,46 @@ def generate_template(target):
             '\n'
             '# Install build dependencies.'
         ]
-        # TODO: write package management.
+        packages = []
+        package_names = []
+        package_func = None
         if target.os == 'alpine':
-            packages = [
-                ''.join(
-                    [
-                        'alpine-sdk=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'alpine-sdk'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'curl=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'curl'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'gawk=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'gawk'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'linux-headers=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'linux-headers'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'openrc=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'openrc'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'perl=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'perl'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'pkgconf=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'pkgconf'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'python3=',
-                        '{0}'.format(
-                            get_alpine_package_version(
-                                target.version,
-                                'python3'
-                            )
-                        )
-                    ]
-                ),
+            package_names = [
+                'alpine-sdk',
+                'curl',
+                'gawk',
+                'linux-headers',
+                'openrc',
+                'perl',
+                'pkgconf',
+                'python3'
             ]
-        elif target.os == 'debian':
-            packages = [
-                ''.join(
-                    [
-                        'apt-transport-https=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'apt-transport-https'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'build-essential=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'build-essential'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'curl=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'curl'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'gawk=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'gawk'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'perl=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'perl'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'pkg-config=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'pkg-config'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'python3=',
-                        '{0}'.format(
-                            get_debian_package_version(
-                                target.version,
-                                'python3'
-                            )
-                        )
-                    ]
-                )
+            package_func = get_alpine_package_version
+        elif target.os in ('debian', 'ubuntu'):
+            package_names = [
+                'apt-transport-https',
+                'build-essential',
+                'curl',
+                'gawk',
+                'perl',
+                'pkg-config',
+                'python3'
             ]
+            if target.os == 'debian':
+                package_func = get_debian_package_version
+            elif target.os == 'ubuntu':
+                package_func = get_ubuntu_package_version
         elif target.os == 'fedora':
+            # TODO: write package management.
             print('Collate Fedora packages here.')
         elif target.os == 'rocky':
+            # TODO: write package management.
             print('Collate Rocky packages here.')
-        elif target.os == 'ubuntu':
-            packages = [
-                ''.join(
-                    [
-                        'apt-transport-https=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'apt-transport-https'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'build-essential=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'build-essential'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'curl=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'curl'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'gawk=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'gawk'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'perl=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'perl'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'pkg-config=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'pkg-config'
-                            )
-                        )
-                    ]
-                ),
-                ''.join(
-                    [
-                        'python3=',
-                        '{0}'.format(
-                            get_ubuntu_package_version(
-                                target.version,
-                                'python3'
-                            )
-                        )
-                    ]
-                )
-            ]
+        for pkg in package_names:
+            pkg_version = package_func(target.version, pkg)
+            # TODO: write last item list logic for newlines.
+            pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
+            packages.append(pkg_string)
 
         f.writelines(dockerfile_contents)
 
