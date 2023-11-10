@@ -120,85 +120,20 @@ def json_to_namespace(json_obj):
     )
     return json_namespace
 
-# Retrieve the release version tags for Perseus.
-def get_perseus_tags():
-    perseus_json = get_data(
-        data_url='{0}'.format(PERSEUS_URL),
+def get_repo_tags(repo_url):
+    repo_json = get_data(
+        data_url='{0}'.format(repo_url),
         content_type='application/json'
     )
-    perseus_namespace = json_to_namespace(perseus_json)
+    repo_namespace = json_to_namespace(repo_json)
     tags = []
-    for perseus_release in enumerate(perseus_namespace):
-        version_tag = perseus_release[1].tag_name
+    for repo_release in enumerate(repo_namespace):
+        version_tag = repo_release[1].tag_name
         tags.append(version_tag)
     return tags
 
-def get_perseus_latest_tag():
-    tags = get_perseus_tags()
-    return tags[0]
-
-def get_binaryen_tags():
-    binaryen_json = get_data(
-        data_url='{0}'.format(BINARYEN_URL),
-        content_type='application/json'
-    )
-    binaryen_namespace = json_to_namespace(binaryen_json)
-    tags = []
-    for binaryen_release in enumerate(binaryen_namespace):
-        version_tag = binaryen_release[1].tag_name
-        tags.append(version_tag)
-    return tags
-
-def get_binaryen_latest_tag():
-    tags = get_binaryen_tags()
-    return tags[0]
-
-def get_bonnie_tags():
-    bonnie_json = get_data(
-        data_url='{0}'.format(BONNIE_URL),
-        content_type='application/json'
-    )
-    bonnie_namespace = json_to_namespace(bonnie_json)
-    tags = []
-    for bonnie_release in enumerate(bonnie_namespace):
-        version_tag = bonnie_release[1].tag_name
-        tags.append(version_tag)
-    return tags
-
-def get_bonnie_latest_tag():
-    tags = get_bonnie_tags()
-    return tags[0]
-
-def get_esbuild_tags():
-    esbuild_json = get_data(
-        data_url='{0}'.format(ESBUILD_URL),
-        content_type='application/json'
-    )
-    esbuild_namespace = json_to_namespace(esbuild_json)
-    tags = []
-    for esbuild_release in enumerate(esbuild_namespace):
-        version_tag = esbuild_release[1].tag_name
-        tags.append(version_tag)
-    return tags
-
-def get_esbuild_latest_tag():
-    tags = get_esbuild_tags()
-    return tags[0]
-
-def get_wasm_pack_tags():
-    wasm_pack_json = get_data(
-        data_url='{0}'.format(WASM_PACK_URL),
-        content_type='application/json'
-    )
-    wasm_pack_namespace = json_to_namespace(wasm_pack_json)
-    tags = []
-    for wasm_pack_release in enumerate(wasm_pack_namespace):
-        version_tag = wasm_pack_release[1].tag_name
-        tags.append(version_tag)
-    return tags
-
-def get_wasm_pack_latest_tag():
-    tags = get_wasm_pack_tags()
+def get_repo_latest_tag(repo_url):
+    tags = get_repo_tags(repo_url)
     return tags[0]
           
 def get_latest_distribution(linux_url):
@@ -376,7 +311,7 @@ def generate_directory(dir_path):
         os.makedirs(dir_path)
 
 def generate_docker_files():
-    perseus_latest = get_perseus_latest_tag()
+    perseus_latest = get_repo_latest_tag(PERSEUS_URL)
     root_path='./{0}'.format(perseus_latest)
     if not os.path.exists(root_path):
         generate_directory(root_path)
