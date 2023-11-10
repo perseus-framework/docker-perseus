@@ -68,6 +68,13 @@ UBUNTU_PKG_URL=[
     '&source_name='
 ]
 
+PERSEUS_EXAMPLE_DEFAULT='showcase'
+PERSEUS_CLI_DEFAULT='false'
+ESBUILD_TARGET_DEFAULT='es6'
+WASM_TARGET_DEFAULT='wasm32-unknown-unknown'
+CARGO_NET_DEFAULT='false'
+
+
 # Check whether or not the host is running Linux.
 # We cannot proceed unless we are on a Linux host.
 def os_is_linux():
@@ -283,10 +290,13 @@ def generate_template(target):
     file_path = '{0}/Dockerfile'.format(target.path)
     f = open(file=file_path, mode='w')
     dockerfile_contents = [
+        '# Pull base image\n.',
         'FROM {0} AS base\n'.format(target.tag),
         '\n',
+        '# Define optional arguments we can pass to `docker`.\n'
         'ARG EXAMPLE_NAME \\\n',
         '\tPERSEUS_VERSION \\\n',
+        '\tPERSEUS_CLI_SEQUENTIAL \\\n',
         '\tBINARYEN_VERSION \\\n',
         '\tBONNIE_VERSION \\\n',
         '\tESBUILD_VERSION \\\n',
@@ -295,16 +305,96 @@ def generate_template(target):
         '\tWASM_TARGET \\\n',
         '\tCARGO_NET_GIT_FETCH_WITH_CLI \\\n',
         '\n',
+        '# Export environment variables.\n',
+        '# NOTE: Setting PERSEUS_CLI_SEQUENTIAL to true is required for low memory environments.\n',
+        ''.join(
+            'ENV EXAMPLE_NAME="${',
+            'EXAMPLE_NAME:-',
+            '{0}'.format(PERSEUS_EXAMPLE_DEFAULT),
+            '}" \\\n'
+        ),
         'ENV EXAMPLE_NAME=\"${EXAMPLE_NAME\:-showcase}\" \\\n',
         ''.join(
             [
                 '\tPERSEUS_VERSION="${',
-                '{0}'.format(get_perseus_latest_tag()),
+                'PERSEUS_VERSION:-',
+                '{0}'.format(get_repo_latest_tag(PERSEUS_URL)),
                 '}" \\\n'
             ]
-        )
+        ),
+        ''.join(
+            [
+                '\tPERSEUS_CLI_SEQUENTIAL="${',
+                'PERSEUS_CLI_SEQUENTIAL:-',
+                '{0}'.format(PERSEUS_CLI_DEFAULT),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tBINARYEN_VERSION="${',
+                'BINARYEN_VERSION:-',
+                '{0}'.format(get_repo_latest_tag(BINARYEN_URL)),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tBONNIE_VERSION="${',
+                'BONNIE_VERSION:-',
+                '{0}'.format(get_repo_latest_tag(BONNIE_URL)),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tESBUILD_VERSION="${',
+                'ESBUILD_VERSION:-',
+                '{0}'.format(get_repo_latest_tag(ESBUILD_URL)),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tESBUILD_TARGET="${',
+                'ESBUILD_TARGET:-',
+                '{0}'.format(ESBUILD_TARGET_DEFAULT),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tWASM_PACK_VERSION="${',
+                'WASM_PACK_VERSION:-',
+                '{0}'.format(get_repo_latest_tag(WASM_PACK_URL)),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tWASM_TARGET="${',
+                'WASM_TARGET:-',
+                '{0}'.format(WASM_TARGET_DEFAULT),
+                '}" \\\n'
+            ]
+        ),
+        ''.join(
+            [
+                '\tCARGO_NET_GIT_FETCH_WITH_CLI="${',
+                'CARGO_NET_GIT_FETCH_WITH_CLI:-',
+                '{0}'.format(CARGO_NET_DEFAULT),
+                '}" \\\n'
+            ]
+        ),
+        '\n',
+        '# Work from the root of the container.\n',
+        'WORKDIR /\n',
+        '\n'
+        '# Install build dependencies.'
     ]
-    f.writelines(dockerfile_contents)
+
+    # TODO: write package management.
+    # f.writelines(dockerfile_contents)
 
 def generate_directory(dir_path):
     if not os.path.exists(dir_path):
