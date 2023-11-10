@@ -153,15 +153,47 @@ def get_latest_distribution(linux_url):
     )
     distro_namespace = json_to_namespace(distro_string)
     if linux_name == 'alpine':
-        re_str = '(?<=\[\`)[0-9]{1,}[\.]{1}[0-9]{1,}[\.]{1}[0-9]{1,}(?=\`, \`[0-9]{1,}[\.][0-9]{1,}\`, \`[0-9]{1,}\`, \`latest\`\])'
+        re_str = ' '.join(
+            [
+                '(?<=\[\`)[0-9]{1,}[\.]{1}[0-9]{1,}[\.]{1}[0-9]{1,}(?=\`,',
+                '\`[0-9]{1,}[\.][0-9]{1,}\`,',
+                '\`[0-9]{1,}\`,',
+                '\`latest\`\])'
+            ]
+        )
     elif linux_name == 'debian':
-        re_str = '(?<=\[\`bullseye-slim\`, \`bullseye-[0-9]{8}-slim\`, \`)[0-9]{1,}[\.]{1}[0-9]{1,}-slim(?=\`, \`[0-9]{1,}-slim\`\])'
+        re_str = ' '.join(
+            [
+                '(?<=\[\`bullseye-slim\`,',
+                '\`bullseye-[0-9]{8}-slim\`,',
+                '\`)[0-9]{1,}[\.]{1}[0-9]{1,}-slim(?=\`,',
+                '\`[0-9]{1,}-slim\`\])'
+            ]
+        )
     elif linux_name == 'fedora':
-        re_str = '(?<=\[\`)[0-9]{1,}(?=\`, \`latest\`\])'
+        re_str = ' '.join(
+            [
+                '(?<=\[\`)[0-9]{1,}(?=\`,',
+                '\`latest\`\])'
+            ]
+        )
     elif linux_name == 'rocky':
-        re_str = '(?<=\[\`[0-9]{1,}[\.]{1}[0-9]{1,}[\.]{1}[0-9]{8}-minimal\`, \`)[0-9]{1,}[\.]{1}[0-9]{1,}-minimal(?=\`, \`[0-9]{1,}-minimal\`\])'
+        re_str = ' '.join(
+            [
+                '(?<=\[\`[0-9]{1,}[\.]{1}[0-9]{1,}[\.]{1}[0-9]{8}-minimal\`,',
+                '\`)[0-9]{1,}[\.]{1}[0-9]{1,}-minimal(?=\`,',
+                '\`[0-9]{1,}-minimal\`\])'
+            ]
+        )
     elif linux_name == 'ubuntu':
-        re_str = '(?<=\[\`)[0-9]{1,}[\.]{1}[0-9]{1,}(?=\`, \`jammy-[0-9]{8}\`, \`jammy\`, \`latest\`\])'
+        re_str = ' '.join(
+            [
+                '(?<=\[\`)[0-9]{1,}[\.]{1}[0-9]{1,}(?=\`,',
+                '\`jammy-[0-9]{8}\`,',
+                '\`jammy\`,',
+                '\`latest\`\])'
+            ]
+        )
     distro_latest = re.search(
         '{0}'.format(re_str),
         '{0}'.format(distro_namespace.full_description)
