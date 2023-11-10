@@ -4,7 +4,6 @@ from collections import namedtuple
 from types import SimpleNamespace
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
-import html_to_json
 import tarfile
 import platform
 import subprocess
@@ -217,6 +216,7 @@ def get_debian_package_version(distro_series, pkg):
     return pkg_version_string
 
 def get_fedora_package_version(ctx, fedora_release, pkg):
+    # TODO: Clean up implementation of Koji, remove ctx param.
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
     pkg_json = ctx.getLatestBuilds(
