@@ -427,15 +427,260 @@ def generate_template(target):
         ]
         # TODO: write package management.
         if target.os == 'alpine':
-            print('Collate Alpine packages here.')
+            packages = [
+                ''.join(
+                    [
+                        'alpine-sdk=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'alpine-sdk'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'curl=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'curl'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'gawk=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'gawk'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'linux-headers=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'linux-headers'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'openrc=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'openrc'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'perl=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'perl'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'pkgconf=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'pkgconf'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'python3=',
+                        '{0}'.format(
+                            get_alpine_package_version(
+                                target.version,
+                                'python3'
+                            )
+                        )
+                    ]
+                ),
+            ]
         elif target.os == 'debian':
-            print('Collate Debian packages here.')
+            packages = [
+                ''.join(
+                    [
+                        'apt-transport-https=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'apt-transport-https'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'build-essential=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'build-essential'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'curl=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'curl'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'gawk=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'gawk'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'perl=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'perl'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'pkg-config=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'pkg-config'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'python3=',
+                        '{0}'.format(
+                            get_debian_package_version(
+                                target.version,
+                                'python3'
+                            )
+                        )
+                    ]
+                )
+            ]
         elif target.os == 'fedora':
             print('Collate Fedora packages here.')
         elif target.os == 'rocky':
             print('Collate Rocky packages here.')
         elif target.os == 'ubuntu':
-            print('Collate Ubuntu packages here.')
+            packages = [
+                ''.join(
+                    [
+                        'apt-transport-https=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'apt-transport-https'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'build-essential=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'build-essential'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'curl=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'curl'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'gawk=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'gawk'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'perl=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'perl'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'pkg-config=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'pkg-config'
+                            )
+                        )
+                    ]
+                ),
+                ''.join(
+                    [
+                        'python3=',
+                        '{0}'.format(
+                            get_ubuntu_package_version(
+                                target.version,
+                                'python3'
+                            )
+                        )
+                    ]
+                )
+            ]
 
         f.writelines(dockerfile_contents)
 
@@ -458,27 +703,32 @@ def generate_docker_files():
             TargetOS(
                 os='alpine',
                 path='alpine{0}'.format(alpine_latest),
-                tag='alpine:{0}'.format(alpine_latest)
+                tag='alpine:{0}'.format(alpine_latest),
+                version='{0}'.format(alpine_latest)
             ),
             TargetOS(
                 os='debian',
                 path='debian{0}'.format(debian_latest),
-                tag='debian:{0}'.format(debian_latest)
+                tag='debian:{0}'.format(debian_latest),
+                version='{0}'.format(debian_latest)
             ),
             TargetOS(
                 os='fedora',
                 path='fedora{0}'.format(fedora_latest),
-                tag='fedora:{0}'.format(fedora_latest)
+                tag='fedora:{0}'.format(fedora_latest),
+                version='{0}'.format(fedora_latest)
             ),
             TargetOS(
                 os='rocky',
                 path='rocky{0}'.format(rocky_latest),
-                tag='rocky:{0}'.format(rocky_latest)
+                tag='rocky:{0}'.format(rocky_latest),
+                version='{0}'.format(rocky_latest)
             ),
             TargetOS(
                 os='ubuntu',
                 path='ubuntu{0}'.format(ubuntu_latest),
-                tag='ubuntu:{0}'.format(ubuntu_latest)
+                tag='ubuntu:{0}'.format(ubuntu_latest),
+                version='{0}'.format(ubuntu_latest)
             )
         ]
         for target in targets:
