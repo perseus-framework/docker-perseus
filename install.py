@@ -425,6 +425,7 @@ def generate_template(target):
             '\n'
             '# Install build dependencies.'
         ]
+        # TODO: begin block of code to be abstracted into function.
         packages = []
         package_names = []
         package_func = None
@@ -490,7 +491,9 @@ def generate_template(target):
                 pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
             packages.append(pkg_string)
         packages.reverse()
-        # packages[0].replace('\t', 'dnf -y install ')
+        packages[0] = packages[0].replace('\t', 'dnf -y install ')
+        # TODO: end block of code to be abstracted into function.
+        # TODO: write list concatenation.
         f.writelines(dockerfile_contents)
 
 def generate_directory(dir_path):
