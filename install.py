@@ -430,25 +430,25 @@ def generate_template(target):
         package_func = None
         if target.os == 'alpine':
             package_names = [
-                'alpine-sdk',
-                'curl',
-                'gawk',
-                'linux-headers',
-                'openrc',
-                'perl',
+                'python3',
                 'pkgconf',
-                'python3'
+                'perl',
+                'openrc',
+                'linux-headers',
+                'gawk',
+                'curl',
+                'alpine-sdk'
             ]
             package_func = get_alpine_package_version
         elif target.os in ('debian', 'ubuntu'):
             package_names = [
-                'apt-transport-https',
-                'build-essential',
-                'curl',
-                'gawk',
-                'perl',
+                'python3',
                 'pkg-config',
-                'python3'
+                'perl',
+                'gawk',
+                'curl',
+                'build-essential',
+                'apt-transport-https'
             ]
             if target.os == 'debian':
                 package_func = get_debian_package_version
@@ -456,38 +456,41 @@ def generate_template(target):
                 package_func = get_ubuntu_package_version
         elif target.os == 'fedora':
             package_names = [
-                'automake',
-                'curl-minimal',
-                'gawk',
-                'gcc',
-                'gcc-c++',
-                'glibc'
-                'kernel-devel',
-                'make',
-                'perl',
+                'python3',
                 'pkgconf',
-                'python3'
+                'perl',
+                'make',
+                'kernel-devel',
+                'glibc'
+                'gcc-c++',
+                'gcc',
+                'gawk',
+                'curl-minimal',
+                'automake'
             ]
             package_func = get_fedora_package_version
         elif target.os == 'rocky':
             package_names = [
-                'automake',
-                'curl',
-                'gawk',
-                'gcc',
-                'glibc',
-                'make',
-                'perl',
+                'python3',
                 'pkgconf',
-                'python3'
+                'perl',
+                'make',
+                'glibc',
+                'gcc',
+                'gawk',
+                'curl',
+                'automake'
             ]
             package_func = get_rocky_package_version
-        for pkg in package_names:
+        for i, pkg in enumerate(package_names):
             pkg_version = package_func(target.version, pkg)
-            # TODO: write last item list logic for newlines.
-            pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
+            if i > 0:
+                pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
+            else:
+                pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
             packages.append(pkg_string)
-
+        packages.reverse()
+        # packages[0].replace('\t', 'dnf -y install ')
         f.writelines(dockerfile_contents)
 
 def generate_directory(dir_path):
