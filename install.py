@@ -52,7 +52,7 @@ FEDORA_PKG_URL='https://koji.fedoraproject.org/kojihub'
 
 ROCKY_PKG_URL=[
     'https://download.rockylinux.org/pub/rocky/',
-    '/BaseOS/source/tree/Packages/'
+    '/devel/source/tree/Packages/'
 ]
 
 UBUNTU_PKG_URL=[
@@ -455,11 +455,33 @@ def generate_template(target):
             elif target.os == 'ubuntu':
                 package_func = get_ubuntu_package_version
         elif target.os == 'fedora':
-            # TODO: write package management.
-            print('Collate Fedora packages here.')
+            package_names = [
+                'automake',
+                'curl-minimal',
+                'gawk',
+                'gcc',
+                'gcc-c++',
+                'glibc'
+                'kernel-devel',
+                'make',
+                'perl',
+                'pkgconf',
+                'python3'
+            ]
+            package_func = get_fedora_package_version
         elif target.os == 'rocky':
-            # TODO: write package management.
-            print('Collate Rocky packages here.')
+            package_names = [
+                'automake',
+                'curl',
+                'gawk',
+                'gcc',
+                'glibc',
+                'make',
+                'perl',
+                'pkgconf',
+                'python3'
+            ]
+            package_func = get_rocky_package_version
         for pkg in package_names:
             pkg_version = package_func(target.version, pkg)
             # TODO: write last item list logic for newlines.
