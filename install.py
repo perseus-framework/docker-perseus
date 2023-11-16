@@ -248,8 +248,38 @@ def get_debian_package_version(distro_series, pkg):
     return pkg_version_string
 
 def get_fedora_package_version(fedora_release, pkg):
+    """
+        Importing `koji` does not make sense because we only use one method.
+
+        Instead, we can make XMLRPC calls directly to the endpoint and
+        parse the response.
+
+        The body we need for our POST request is as follows:
+
+        <?xml version="1.0"?>
+        <methodCall>
+            <methodName>getLatestBuilds</methodName>
+            <params>
+                <param>
+                    <value>
+                        <string>f38-updates</string>
+                    </value>
+                </param>
+                <param>
+                    <value><nil/></value>
+                </param>
+                <param>
+                    <value>
+                        <string>curl</string>
+                    </value>
+                </param>
+                <param>
+                    <value><nil/></value>
+                </param>
+            </params>
+        </methodCall>
+    """
     session = koji.ClientSession(FEDORA_PKG_URL)
-    session.
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
     pkg_json = session.getLatestBuilds(
