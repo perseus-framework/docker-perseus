@@ -247,11 +247,12 @@ def get_debian_package_version(distro_series, pkg):
     pkg_version_string = '{0}'.format(pkg_data)
     return pkg_version_string
 
-def get_fedora_package_version(ctx, fedora_release, pkg):
-    # TODO: Clean up implementation of Koji, remove ctx param.
+def get_fedora_package_version(fedora_release, pkg):
+    session = koji.ClientSession(FEDORA_PKG_URL)
+    session.
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
-    pkg_json = ctx.getLatestBuilds(
+    pkg_json = session.getLatestBuilds(
         api_tag,
         event=None,
         package=api_pkg,
@@ -317,6 +318,94 @@ def get_ubuntu_package_version(distro_series, pkg):
         pkg_namespace.source_package_version
     )
     return pkg_version_string
+
+def generate_packages_list(target):
+    packages = []
+    package_names = []
+    package_func = None
+    package_manager = None
+    if target.os == 'alpine':
+        package_names = [
+            'python3',
+            'pkgconf',
+            'perl',
+            'openrc',
+            'linux-headers',
+            'gawk',
+            'curl',
+            'alpine-sdk'
+        ]
+        package_func = get_alpine_package_version
+        package_command = 'apk'
+    elif target.os in ('debian', 'ubuntu'):
+        package_names = [
+            'python3',
+            'pkg-config',
+            'perl',
+            'gawk',
+            'curl',
+            'build-essential',
+            'apt-transport-https'
+        ]
+        if target.os == 'debian':
+            package_func = get_debian_package_version
+        elif target.os == 'ubuntu':
+            package_func = get_ubuntu_package_version
+        package_command = 'apt-get'
+    elif target.os == 'fedora':
+        package_names = [
+            'python3',
+            'pkgconf',
+            'perl',
+            'make',
+            'kernel-devel',
+            'glibc'
+            'gcc-c++',
+            'gcc',
+            'gawk',
+            'curl-minimal',
+            'automake'
+        ]
+        package_func = get_fedora_package_version
+        package_command = 'dnf'
+    elif target.os == 'rocky':
+        package_names = [
+            'python3',
+            'pkgconf',
+            'perl',
+            'make',
+            'glibc',
+            'gcc',
+            'gawk',
+            'curl',
+            'automake'
+        ]
+        package_func = get_rocky_package_version
+        # TODO: minimal install process for yum.
+        # URL: https://dl.rockylinux.org/pub/rocky/9/devel/aarch64/os/Packages/y/yum-4.14.0-5.el9_2.noarch.rpm
+        # List of packages:
+        # yum-4.14.0-5.el9_2.noarch.rpm
+        # dnf-4.14.0-5.el9_2.noarch.rpm
+        # python3-3.9.16-1.el9_2.2.aarch64.rpm
+        # python3-dnf-4.14.0-5.el9_2.noarch.rpm
+        # python(abi) 3.9           <--- TODO: what is this ???
+        # python3-gpg-1.15.1-6.el9.aarch64.rpm
+        # python3-hawkey-0.69.0-3.el9_2.aarch64.rpm
+        # python3-libcomps-0.1.18-1.el9.aarch64.rpm
+        # python3-libdnf-0.69.0-3.el9_2.aarch64.rpm
+        # python3-rpm-4.16.1.3-22.el9.aarch64.rpm 
+        #   And this is just the list so far...
+        package_command = 'yum'
+    for i, pkg in enumerate(package_names):
+        pkg_version = package_func(target.version, pkg)
+        if i > 0:
+            pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
+        else:
+            pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
+        packages.append(pkg_string)
+    packages.append('RUN {0}')
+    packages.reverse()
+    packages[0] = packages[0].replace('\t', '\tdnf -y install ')
 
 def generate_template(target):
     file_path = '{0}/Dockerfile'.format(target.path)
@@ -425,74 +514,7 @@ def generate_template(target):
             '\n'
             '# Install build dependencies.'
         ]
-        # TODO: begin block of code to be abstracted into function.
-        packages = []
-        package_names = []
-        package_func = None
-        if target.os == 'alpine':
-            package_names = [
-                'python3',
-                'pkgconf',
-                'perl',
-                'openrc',
-                'linux-headers',
-                'gawk',
-                'curl',
-                'alpine-sdk'
-            ]
-            package_func = get_alpine_package_version
-        elif target.os in ('debian', 'ubuntu'):
-            package_names = [
-                'python3',
-                'pkg-config',
-                'perl',
-                'gawk',
-                'curl',
-                'build-essential',
-                'apt-transport-https'
-            ]
-            if target.os == 'debian':
-                package_func = get_debian_package_version
-            elif target.os == 'ubuntu':
-                package_func = get_ubuntu_package_version
-        elif target.os == 'fedora':
-            package_names = [
-                'python3',
-                'pkgconf',
-                'perl',
-                'make',
-                'kernel-devel',
-                'glibc'
-                'gcc-c++',
-                'gcc',
-                'gawk',
-                'curl-minimal',
-                'automake'
-            ]
-            package_func = get_fedora_package_version
-        elif target.os == 'rocky':
-            package_names = [
-                'python3',
-                'pkgconf',
-                'perl',
-                'make',
-                'glibc',
-                'gcc',
-                'gawk',
-                'curl',
-                'automake'
-            ]
-            package_func = get_rocky_package_version
-        for i, pkg in enumerate(package_names):
-            pkg_version = package_func(target.version, pkg)
-            if i > 0:
-                pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
-            else:
-                pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
-            packages.append(pkg_string)
-        packages.reverse()
-        packages[0] = packages[0].replace('\t', '\tdnf -y install ')
-        # TODO: end block of code to be abstracted into function.
+        
         # TODO: write list concatenation.
         f.writelines(dockerfile_contents)
 
