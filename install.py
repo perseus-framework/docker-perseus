@@ -11,7 +11,6 @@ import sys
 import re
 import os
 import json
-import koji # we must pip install koji to import
 
 # URLs for accessing data on GitHub.
 GH_API_URL='https://api.github.com/repos/'
@@ -96,12 +95,14 @@ def get_local_platform():
     return platform_data
 
 # Request some data from a remote server.
-def get_data(data_url, content_type):
+def get_data(data_url, req_data, content_type, req_method):
     if content_type is not None:
         req_headers = { 'Content-Type': '{0}'.format(content_type) }
     elif content_type is None:
         req_headers = { 'Content-Type': 'text/html; charset=utf-8' }
-    req = Request(url=data_url, headers=req_headers)
+    if req_method is None:
+        req_method = 'GET'
+    req = Request(url=data_url, data=req_data, headers=req_headers, method=req_method)
     try:
         res = urlopen(req)
     except (HTTPError, URLError) as e:
@@ -248,54 +249,29 @@ def get_debian_package_version(distro_series, pkg):
     return pkg_version_string
 
 def get_fedora_package_version(fedora_release, pkg):
-    """
-        Importing `koji` does not make sense because we only use one method.
-
-        Instead, we can make XMLRPC calls directly to the endpoint and
-        parse the response.
-
-        The body we need for our POST request is as follows:
-
-        <?xml version="1.0"?>
-        <methodCall>
-            <methodName>getLatestBuilds</methodName>
-            <params>
-                <param>
-                    <value>
-                        <string>f38-updates</string>
-                    </value>
-                </param>
-                <param>
-                    <value><nil/></value>
-                </param>
-                <param>
-                    <value>
-                        <string>curl</string>
-                    </value>
-                </param>
-                <param>
-                    <value><nil/></value>
-                </param>
-            </params>
-        </methodCall>
-    """
-    session = koji.ClientSession(FEDORA_PKG_URL)
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
-    pkg_json = session.getLatestBuilds(
-        api_tag,
-        event=None,
-        package=api_pkg,
-        type=None
+    xml_req_body = '''
+<?xml version="1.0"?><methodCall><methodName>getLatestBuilds</methodName><params><param><value><string>{0}</string></value></param><param><value><nil/></value></param><param><value><string>{1}</string></value></param><param><value><nil/></value></param></params></methodCall>
+    '''.format(api_tag, api_pkg)
+    xml_res_body = ''.join(
+        get_data(
+            data_url=FEDORA_PKG_URL,
+            req_data=xml_req_body.strip(),
+            content_type='text/xml',
+            req_method='POST'
+        ).splitlines()
     )
-    # TO DO: optimize the chained calls to replace below.
-    pkg_data = ''.join('{0}'.format(pkg_json)) \
-        .replace("[", "") \
-        .replace("\'", "\"") \
-        .replace("None", "\"\"") \
-        .replace("]", "")
-    pkg_namespace = json_to_namespace(pkg_data)
-    pkg_version_string = '{0}'.format(pkg_namespace.nvr)
+    pkg_version_string = re.search(
+        ''.join(
+            [
+                '(?<=<name>nvr</name><value><string>)',
+                '[^\ \/<>]{1,}',
+                '(?=</string></value>)'
+            ]
+        ),
+        xml_res_body
+    ).group(0)
     return pkg_version_string
 
 def get_rocky_package_version(rocky_release, pkg):
