@@ -45,8 +45,6 @@ ALPINE_PKG_URL=[
 
 DEBIAN_PKG_URL='https://sources.debian.org/api/src/'
 
-# Fedora Project provides acess to their API programmatically using
-# a Python package called `koji`. We must `pip install koji` to import it.
 FEDORA_PKG_URL='https://koji.fedoraproject.org/kojihub'
 
 ROCKY_PKG_URL=[
