@@ -385,20 +385,6 @@ def generate_packages_list(target):
             'automake'
         ]
         package_func = get_rocky_package_version
-        # TODO: minimal install process for yum.
-        # URL: https://dl.rockylinux.org/pub/rocky/9/devel/aarch64/os/Packages/y/yum-4.14.0-5.el9_2.noarch.rpm
-        # List of packages:
-        # yum-4.14.0-5.el9_2.noarch.rpm
-        # dnf-4.14.0-5.el9_2.noarch.rpm
-        # python3-3.9.16-1.el9_2.2.aarch64.rpm
-        # python3-dnf-4.14.0-5.el9_2.noarch.rpm
-        # python(abi) 3.9           <--- TODO: what is this ???
-        # python3-gpg-1.15.1-6.el9.aarch64.rpm
-        # python3-hawkey-0.69.0-3.el9_2.aarch64.rpm
-        # python3-libcomps-0.1.18-1.el9.aarch64.rpm
-        # python3-libdnf-0.69.0-3.el9_2.aarch64.rpm
-        # python3-rpm-4.16.1.3-22.el9.aarch64.rpm 
-        #   And this is just the list so far...
         package_command = 'yum'
     for i, pkg in enumerate(package_names):
         pkg_version = package_func(target.version, pkg)
