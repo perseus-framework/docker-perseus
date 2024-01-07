@@ -249,13 +249,40 @@ def get_debian_package_version(distro_series, pkg):
 def get_fedora_package_version(fedora_release, pkg):
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
-    xml_req_body = '''
-<?xml version="1.0"?><methodCall><methodName>getLatestBuilds</methodName><params><param><value><string>{0}</string></value></param><param><value><nil/></value></param><param><value><string>{1}</string></value></param><param><value><nil/></value></param></params></methodCall>
-    '''.format(api_tag, api_pkg)
+    xml_req_body = [
+        '<?xml version="1.0"?>',
+        '<methodCall>',
+        '<methodName>',
+        'getLatestBuilds',
+        '</methodName>',
+        '<params>',
+        '<param>',
+        '<value>',
+        '<string>{0}</string>'.format(api_tag),
+        '</value>',
+        '</param>',
+        '<param>',
+        '<value>',
+        '<nil/>',
+        '</value>',
+        '</param>',
+        '<param>',
+        '<value>',
+        '<string>{0}</string>'.format(api_pkg),
+        '</value>',
+        '</param>',
+        '<param>',
+        '<value>',
+        '<nil/>',
+        '</value>',
+        '</param>',
+        '</params>',
+        '</methodCall>'
+    ]
     xml_res_body = ''.join(
         get_data(
             data_url=FEDORA_PKG_URL,
-            req_data=xml_req_body.strip(),
+            req_data=''.join(xml_req_body),
             content_type='text/xml',
             req_method='POST'
         ).splitlines()
@@ -340,7 +367,10 @@ def generate_packages_list(target):
             'alpine-sdk'
         ]
         package_func = get_alpine_package_version
-        package_command = 'apk'
+        package_command = [
+            'apk update; \\\n',
+            '\tapk add \\\n'
+        ]
     elif target.os in ('debian', 'ubuntu'):
         package_names = [
             'python3',
@@ -355,7 +385,10 @@ def generate_packages_list(target):
             package_func = get_debian_package_version
         elif target.os == 'ubuntu':
             package_func = get_ubuntu_package_version
-        package_command = 'apt-get'
+        package_command = [
+            'apt-get update; \\\n',
+            '\tapt-get -y install --no-install-recommends \\\n'
+        ]
     elif target.os == 'fedora':
         package_names = [
             'python3',
