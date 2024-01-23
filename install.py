@@ -100,7 +100,12 @@ def get_data(data_url, req_data, content_type, req_method):
         req_headers = { 'Content-Type': 'text/html; charset=utf-8' }
     if req_method is None:
         req_method = 'GET'
-    req = Request(url=data_url, data=req_data, headers=req_headers, method=req_method)
+    req = Request(
+        url=data_url,
+        data=req_data,
+        headers=req_headers,
+        method=req_method
+    )
     try:
         res = urlopen(req)
     except (HTTPError, URLError) as e:
@@ -115,6 +120,7 @@ def get_data(data_url, req_data, content_type, req_method):
         res_data = res.read().decode('utf-8')
         return res_data
 
+# Convert a JSON object to a SimpleNamespace.
 def json_to_namespace(json_obj):
     if json_obj == None:
         return None
@@ -125,6 +131,7 @@ def json_to_namespace(json_obj):
     )
     return json_namespace
 
+# Retrieve a list of tags from a remote respository.
 def get_repo_tags(repo_url):
     repo_json = get_data(
         data_url='{0}'.format(repo_url),
@@ -137,10 +144,12 @@ def get_repo_tags(repo_url):
         tags.append(version_tag)
     return tags
 
+# Retrieve only the latest tag from a remote repository.
 def get_repo_latest_tag(repo_url):
     tags = get_repo_tags(repo_url)
     return tags[0]
-          
+
+# Retrieve the semantic version of a given distro's latest stable release.
 def get_latest_distribution(linux_url):
     linux_name = re.search(
         '(?<=repositories/)[a-z]{1,}',
@@ -223,6 +232,7 @@ def get_alpine_package_version(alpine_release, pkg):
     pkg_version_string = "{0}={1}-r{2}".format(pkg_name, pkg_ver, pkg_rel)
     return pkg_version_string
 
+# Retrieve the dependency string required for a specific Debian package release.
 def get_debian_package_version(distro_series, pkg):
     api_pkg = '{0}'.format(pkg)
     pkg_url = '{0}{1}{2}'.format(DEBIAN_PKG_URL, api_pkg, '/')
@@ -246,6 +256,7 @@ def get_debian_package_version(distro_series, pkg):
     pkg_version_string = '{0}'.format(pkg_data)
     return pkg_version_string
 
+# Retrieve the dependency string required for a specific Fedora package release.
 def get_fedora_package_version(fedora_release, pkg):
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
@@ -299,6 +310,7 @@ def get_fedora_package_version(fedora_release, pkg):
     ).group(0)
     return pkg_version_string
 
+# Retrieve the dependency string required for a specific Rocky package release.
 def get_rocky_package_version(rocky_release, pkg):
     api_tag = re.search(
         '[0-9]{1,}[\.]{1}[0-9]{1,}(?=[^ ]{0,9}-minimal)',
@@ -330,6 +342,7 @@ def get_rocky_package_version(rocky_release, pkg):
     ).group(0)
     return pkg_version_string
 
+# Retrieve the dependency string required for a specific Ubuntu package release.
 def get_ubuntu_package_version(distro_series, pkg):
     if distro_series == None:
         return None
