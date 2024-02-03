@@ -70,7 +70,6 @@ ESBUILD_TARGET_DEFAULT='es6'
 WASM_TARGET_DEFAULT='wasm32-unknown-unknown'
 CARGO_NET_DEFAULT='false'
 
-
 # Check whether or not the host is running Linux.
 # We cannot proceed unless we are on a Linux host.
 def os_is_linux():
@@ -93,20 +92,20 @@ def get_local_platform():
     return platform_data
 
 # Request some data from a remote server.
-def get_data(data_url, req_data, content_type, req_method):
+def get_data(data_url, req_data=None, content_type=None, req_method=None):
     if content_type is not None:
         req_headers = { 'Content-Type': '{0}'.format(content_type) }
     elif content_type is None:
         req_headers = { 'Content-Type': 'text/html; charset=utf-8' }
     if req_method is None:
         req_method = 'GET'
-    req = Request(
-        url=data_url,
-        data=req_data,
-        headers=req_headers,
-        method=req_method
-    )
     try:
+        req = Request(
+            url=data_url,
+            data=req_data,
+            headers=req_headers,
+            method=req_method
+        )
         res = urlopen(req)
     except (HTTPError, URLError) as e:
         if hasattr(e, 'code'):
@@ -202,9 +201,12 @@ def get_latest_distribution(linux_url):
                 '\`latest\`\])'
             ]
         )
+    linux_pattern = re.compile(
+        pattern = re_str
+    )
     distro_latest = re.search(
-        '{0}'.format(re_str),
-        '{0}'.format(distro_namespace.full_description)
+        pattern = linux_pattern,
+        string = '{0}'.format(distro_namespace.full_description)
     ).group(0)
     return distro_latest
 
@@ -240,18 +242,20 @@ def get_debian_package_version(distro_series, pkg):
         data_url='{0}'.format(pkg_url),
         content_type='application/json'
     )
-    re_pattern = ''.join(
-        [
-            '(?<="suites":\["',
-            '{0}'.format(distro_series),
-            '"\],"version":")',
-            '[a-z0-9\.+-]{1,}',
-            '(?=")'
-        ]
+    re_pattern = re.compile(
+        ''.join(
+            [
+                '(?<="suites":\["',
+                '{0}'.format(distro_series),
+                '"\],"version":")',
+                '[a-z0-9\.+-]{1,}',
+                '(?=")'
+            ]
+        )
     )
     pkg_data = re.search(
-        re_pattern,
-        '{0}'.format(pkg_json)
+        pattern=re_pattern,
+        string='{0}'.format(pkg_json)
     ).group(0)
     pkg_version_string = '{0}'.format(pkg_data)
     return pkg_version_string
@@ -260,7 +264,7 @@ def get_debian_package_version(distro_series, pkg):
 def get_fedora_package_version(fedora_release, pkg):
     api_tag = "f{0}-updates".format(fedora_release)
     api_pkg = "{0}".format(pkg)
-    xml_req_body = [
+    xml_req_xml = [
         '<?xml version="1.0"?>',
         '<methodCall>',
         '<methodName>',
@@ -290,14 +294,14 @@ def get_fedora_package_version(fedora_release, pkg):
         '</params>',
         '</methodCall>'
     ]
-    xml_res_body = ''.join(
-        get_data(
-            data_url=FEDORA_PKG_URL,
-            req_data=''.join(xml_req_body),
-            content_type='text/xml',
-            req_method='POST'
-        ).splitlines()
-    )
+    xml_req_body = ''.join(xml_req_xml)
+    xml_res_data = get_data(
+        data_url=FEDORA_PKG_URL,
+        req_data=xml_req_body,
+        content_type='text/xml',
+        req_method='POST'
+    ).splitlines()
+    xml_res_body = ''.join(xml_res_data)
     pkg_version_string = re.search(
         ''.join(
             [
@@ -364,84 +368,90 @@ def get_ubuntu_package_version(distro_series, pkg):
     return pkg_version_string
 
 def generate_packages_list(target):
-    packages = []
-    package_names = []
-    package_func = None
-    package_manager = None
-    if target.os == 'alpine':
-        package_names = [
-            'python3',
-            'pkgconf',
-            'perl',
-            'openrc',
-            'linux-headers',
-            'gawk',
-            'curl',
-            'alpine-sdk'
-        ]
-        package_func = get_alpine_package_version
-        package_command = [
-            'apk update; \\\n',
-            '\tapk add \\\n'
-        ]
-    elif target.os in ('debian', 'ubuntu'):
-        package_names = [
-            'python3',
-            'pkg-config',
-            'perl',
-            'gawk',
-            'curl',
-            'build-essential',
-            'apt-transport-https'
-        ]
-        if target.os == 'debian':
-            package_func = get_debian_package_version
-        elif target.os == 'ubuntu':
-            package_func = get_ubuntu_package_version
-        package_command = [
-            'apt-get update; \\\n',
-            '\tapt-get -y install --no-install-recommends \\\n'
-        ]
-    elif target.os == 'fedora':
-        package_names = [
-            'python3',
-            'pkgconf',
-            'perl',
-            'make',
-            'kernel-devel',
-            'glibc'
-            'gcc-c++',
-            'gcc',
-            'gawk',
-            'curl-minimal',
-            'automake'
-        ]
-        package_func = get_fedora_package_version
-        package_command = 'dnf'
-    elif target.os == 'rocky':
-        package_names = [
-            'python3',
-            'pkgconf',
-            'perl',
-            'make',
-            'glibc',
-            'gcc',
-            'gawk',
-            'curl',
-            'automake'
-        ]
-        package_func = get_rocky_package_version
-        package_command = 'yum'
-    for i, pkg in enumerate(package_names):
-        pkg_version = package_func(target.version, pkg)
-        if i > 0:
-            pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
-        else:
-            pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
-        packages.append(pkg_string)
-    packages.append('RUN {0}')
-    packages.reverse()
-    packages[0] = packages[0].replace('\t', '\tdnf -y install ')
+    # 1. create a list for holding the <package_name=semver> strings.
+    # 2. allocate a list of package names alphabetically in reverse.
+    # 3. interpolate entries with appended " \" line continuations, except [0].
+    # 4. reverse entries and append "\n" to all.
+    # 5. return the resulting list.
+    #
+    pass
+    # dest = target.os
+    # package_func = None
+    # package_manager = None
+    # if dest == 'alpine':
+    #     package_names = [
+    #         'python3',
+    #         'pkgconf',
+    #         'perl',
+    #         'openrc',
+    #         'linux-headers',
+    #         'gawk',
+    #         'curl',
+    #         'alpine-sdk'
+    #     ]
+    #     package_func = get_alpine_package_version
+    #     package_command = [
+    #         'apk update; \\\n',
+    #         '\tapk add \\\n'
+    #     ]
+    # elif dest in ('debian', 'ubuntu'):
+    #     package_names = [
+    #         'python3',
+    #         'pkg-config',
+    #         'perl',
+    #         'gawk',
+    #         'curl',
+    #         'build-essential',
+    #         'apt-transport-https'
+    #     ]
+    #     if dest == 'debian':
+    #         package_func = get_debian_package_version
+    #     elif dest == 'ubuntu':
+    #         package_func = get_ubuntu_package_version
+    #     package_command = [
+    #         'apt-get update; \\\n',
+    #         '\tapt-get -y install --no-install-recommends \\\n'
+    #     ]
+    # elif dest == 'fedora':
+    #     package_names = [
+    #         'python3',
+    #         'pkgconf',
+    #         'perl',
+    #         'make',
+    #         'kernel-devel',
+    #         'glibc'
+    #         'gcc-c++',
+    #         'gcc',
+    #         'gawk',
+    #         'curl-minimal',
+    #         'automake'
+    #     ]
+    #     package_func = get_fedora_package_version
+    #     package_command = 'dnf'
+    # elif dest == 'rocky':
+    #     package_names = [
+    #         'python3',
+    #         'pkgconf',
+    #         'perl',
+    #         'make',
+    #         'glibc',
+    #         'gcc',
+    #         'gawk',
+    #         'curl',
+    #         'automake'
+    #     ]
+    #     package_func = get_rocky_package_version
+    #     package_command = 'yum'
+    # for i, pkg in enumerate(package_names):
+    #     pkg_version = package_func(target.version, pkg)
+    #     if i > 0:
+    #         pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
+    #     else:
+    #         pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
+    #     packages.append(pkg_string)
+    # packages.append('RUN {0}')
+    # packages.reverse()
+    # packages[0] = packages[0].replace('\t', '\tdnf -y install ')
 
 def generate_template(target):
     file_path = '{0}/Dockerfile'.format(target.path)
