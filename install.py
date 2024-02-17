@@ -210,6 +210,41 @@ def get_latest_distribution(linux_url):
     ).group(0)
     return distro_latest
 
+# Retrieve the dependency string required for a specific package release.
+def get_package_version(target, pkg):
+    linux_name = '{0}'.format(target.os)
+    linux_channel = '{0}'.format(target.channel)
+    rel_pat = None
+    rel_str = None
+    pkg_pat = None
+    pkg_str = None
+    sfx_str = ''
+    if linux_name == 'alpine':
+        rel_pat = re.compile('^[0-9]{1,}[\.]{1}[0-9]{1,}')
+        rel_str = '{0}'.format(target.channel)
+        sfx_str = '-stable'
+    elif linux_name == 'debian':
+        pkg_pat = re.compile(
+            ''.join(
+                [
+                    '(?<="suites":\["',
+                    '{0}'.format(target.channel),
+                    '"\],"version":")',
+                    '[a-z0-9\.+-]{1,}',
+                    '(?=")'
+                ]
+            )
+        )
+        pkg_str = ''
+    elif linux_name == 'fedora':
+        pass
+    elif linux_name == 'rocky':
+        pass
+    elif linux_name == 'ubuntu':
+        pass
+    else:
+        pass
+
 # Retrieve the dependency string required for a specific Alpine package release.
 def get_alpine_package_version(alpine_release, pkg):
     stable_alpine = '{0}-stable'.format(
