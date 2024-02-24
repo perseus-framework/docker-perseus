@@ -217,11 +217,10 @@ def get_package_version(target, pkg):
     output_str = None
     if linux_name == 'alpine':
         rel_pat = re.compile('^[0-9]{1,}[\.]{1}[0-9]{1,}')
-        rel_str = '{0}'.format(linux_channel)
         sfx_str = '-stable'
         match_obj = re.search(
             pattern=rel_pat,
-            string=rel_str
+            string=linux_channel
         )
         match_str = '{0}{1}'.format(
             match_obj.group(0),
@@ -259,19 +258,34 @@ def get_package_version(target, pkg):
             pkg_semver[2]
         )
     elif linux_name == 'debian':
-        pkg_pat = re.compile(
-            ''.join(
-                [
-                    '(?<="suites":\["',
-                    '{0}'.format(target.channel),
-                    '"\],"version":")',
-                    '[a-z0-9\.+-]{1,}',
-                    '(?=")'
-                ]
-            )
+        pkg_url = '{0}{1}{2}'.format(
+            DEBIAN_PKG_URL,
+            pkg,
+            '/'
         )
-        pkg_str = ''
+        pkg_data_response = get_data(
+            data_url=pkg_url,
+            content_type='application/json'
+        )
+        search_str = ''.join(
+            [
+                '(?<="suites":\["',
+                linux_channel,
+                '"\],"version":")',
+                '[a-z0-9\.+-]{1,}',
+                '(?=")'
+            ]
+        )
+        pkg_pat = re.compile(search_str)
+        match_obj = re.search(
+            pattern=pkg_pat,
+            string=pkg_data_response
+        )
+        output_str = '{0}'.format(
+            match_obj.group(0)
+        )
     elif linux_name == 'fedora':
+        # TODO: finish fedora arm of if statement.
         pass
     elif linux_name == 'rocky':
         pass
