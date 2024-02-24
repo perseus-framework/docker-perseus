@@ -292,41 +292,13 @@ def get_package_version(target, pkg):
             linux_channel,
             sfx_str
         )
-        xml_req_xml = [
-            '<?xml version="1.0"?>',
-            '<methodCall>',
-            '<methodName>',
-            'getLatestBuilds',
-            '</methodName>',
-            '<params>',
-            '<param>',
-            '<value>',
-            '<string>',
-            api_tag,
-            '</string>'
-            '</value>',
-            '</param>',
-            '<param>',
-            '<value>',
-            '<nil/>',
-            '</value>',
-            '</param>',
-            '<param>',
-            '<value>',
-            '<string>',
-            api_tag,
-            '</string>'
-            '</value>',
-            '</param>',
-            '<param>',
-            '<value>',
-            '<nil/>',
-            '</value>',
-            '</param>',
-            '</params>',
-            '</methodCall>'
-        ]
-        xml_req_body = ''.join(xml_req_xml)
+        xml_req_xml = '''
+<?xml version="1.0"?><methodCall><methodName>getLatestBuilds</methodName><params><param><value><string>%%API_TAG%%</string></value></param><param><value><nil/></value></param><param><value><string>%%API_TAG%%</string></value></param><param><value><nil/></value></param></params></methodCall>
+'''
+        xml_req_body = xml_req_xml.strip().replace(
+            '%%API_TAG%%',
+            api_tag
+        )
         pkg_data_response = get_data(
             data_url=FEDORA_PKG_URL,
             req_data=xml_req_body,
