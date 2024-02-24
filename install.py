@@ -353,8 +353,50 @@ def get_package_version(target, pkg):
             match_obj.group(0)
         )
     elif linux_name == 'rocky':
-        pass
+        api_pat = re.compile(
+            '[0-9]{1,}[\.]{1}[0-9]{1,}(?=[^ ]{0,9}-minimal)'
+        )
+        match_obj = re.search(
+            pattern=api_pat,
+            string=linux_channel
+        )
+        match_str = '{0}'.format(
+            match_obj.group(0)
+        )
+        api_dir = pkg[0]
+        pkg_url = '{0}{1}{2}{3}'.format(
+            ROCKY_PKG_URL[0],
+            match_str,
+            ROCKY_PKG_URL[1],
+            api_dir
+        )
+        pkg_data_response = get_data(
+            data_url=pkg_url,
+            content_type=None
+        )
+        pkg_data_str = ' '.join(
+            pkg_data_response.splitlines()
+        )
+        pkg_pat = re.compile(
+            ''.join(
+                [
+                    '(?<=<a\ href="',
+                    pkg,
+                    '-)[^ ]{1,}(?=\.src\.rpm">',
+                    pkg,
+                    ')'
+                ]
+            )
+        )
+        match_obj = re.search(
+            pattern=pkg_pat,
+            string=pkg_data_str
+        )
+        output_str = '{0}'.format(
+            match_obj.group(0)
+        )
     elif linux_name == 'ubuntu':
+        # TODO: finish ubuntu branch of if statement.
         pass
     else:
         pass
