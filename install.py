@@ -396,10 +396,32 @@ def get_package_version(target, pkg):
             match_obj.group(0)
         )
     elif linux_name == 'ubuntu':
-        # TODO: finish ubuntu branch of if statement.
-        pass
-    else:
-        pass
+        pkg_url = '{0}{1}'.format(
+            ''.join(UBUNTU_PKG_URL),
+            pkg
+        ).replace(
+            '%%DISTRO_SERIES%%',
+            linux_channel
+        )
+        pkg_data_response = get_data(
+            data_url=pkg_url,
+            content_type='application/json'
+        )
+        pkg_pat = re.compile(
+            '(?<=\[)\{.*\}(?=\])'
+        )
+        match_obj = re.search(
+            pattern=pkg_pat,
+            string=pkg_data_response
+        )
+        match_str = '{0}'.format(
+            match_obj.group(0)
+        )
+        pkg_ns = json_to_namespace(match_str)
+        output_str = '{0}'.format(
+            pkg_ns.source_package_version
+        )
+    return output_str
 
 # Retrieve the dependency string required for a specific Alpine package release.
 def get_alpine_package_version(alpine_release, pkg):
