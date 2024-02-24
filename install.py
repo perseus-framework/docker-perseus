@@ -214,15 +214,50 @@ def get_latest_distribution(linux_url):
 def get_package_version(target, pkg):
     linux_name = '{0}'.format(target.os)
     linux_channel = '{0}'.format(target.channel)
-    rel_pat = None
-    rel_str = None
-    pkg_pat = None
-    pkg_str = None
-    sfx_str = ''
+    output_str = None
     if linux_name == 'alpine':
         rel_pat = re.compile('^[0-9]{1,}[\.]{1}[0-9]{1,}')
-        rel_str = '{0}'.format(target.channel)
+        rel_str = '{0}'.format(linux_channel)
         sfx_str = '-stable'
+        match_obj = re.search(
+            pattern=rel_pat,
+            string=rel_str
+        )
+        match_str = '{0}{1}'.format(
+            match_obj.group(0),
+            sfx_str
+        )
+        pkg_url = '{0}{1}{2}{3}{4}'.format(
+            ALPINE_PKG_URL[0],
+            match_str,
+            ALPINE_PKG_URL[1],
+            pkg,
+            ALPINE_PKG_URL[2]
+        )
+        pkg_data_response = get_data(
+            data_url=pkg_url
+        )
+        pkg_data_str = ' '.join(
+            pkg_data_response.splitlines()
+        )
+        re_pattern = [
+            '(?<=pkgname=)\w+',
+            '(?<=pkgver=)[^ ]{1,}',
+            '(?<=pkgrel=)[^ ]{1,}'
+        ]
+        pkg_semver = []
+        for p in re_pattern:
+            pkg_pat = re.compile(p)
+            match_obj = re.search(
+                pattern=pkg_pat,
+                string=pkg_data_str
+            )
+            pkg_semver.append(match_obj.group(0))
+        output_str = '{0}={1}-r{2}'.format(
+            pkg_semver[0],
+            pkg_semver[1],
+            pkg_semver[2]
+        )
     elif linux_name == 'debian':
         pkg_pat = re.compile(
             ''.join(
@@ -271,12 +306,16 @@ def get_alpine_package_version(alpine_release, pkg):
 
 # Retrieve the dependency string required for a specific Debian package release.
 def get_debian_package_version(distro_series, pkg):
+    # Make sure a string argument was passed to `pkg` parameter.
     api_pkg = '{0}'.format(pkg)
+    # Interpolate the url for the given `pkg` argument.
     pkg_url = '{0}{1}{2}'.format(DEBIAN_PKG_URL, api_pkg, '/')
+    # Retrieve the JSON returned by the url.
     pkg_json = get_data(
         data_url='{0}'.format(pkg_url),
         content_type='application/json'
     )
+    # Define a pattern to match against within the retrieved JSON.
     re_pattern = re.compile(
         ''.join(
             [
@@ -288,11 +327,14 @@ def get_debian_package_version(distro_series, pkg):
             ]
         )
     )
+    # Store the match extracted from the JSON.
     pkg_data = re.search(
         pattern=re_pattern,
         string='{0}'.format(pkg_json)
     ).group(0)
+    # Define the string to return from this function.
     pkg_version_string = '{0}'.format(pkg_data)
+    # Return the expected output string.
     return pkg_version_string
 
 # Retrieve the dependency string required for a specific Fedora package release.
