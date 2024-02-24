@@ -285,8 +285,73 @@ def get_package_version(target, pkg):
             match_obj.group(0)
         )
     elif linux_name == 'fedora':
-        # TODO: finish fedora arm of if statement.
-        pass
+        pfx_str = 'f'
+        sfx_str = '-updates'
+        api_tag = '{0}{1}{2}'.format(
+            pfx_str,
+            linux_channel,
+            sfx_str
+        )
+        xml_req_xml = [
+            '<?xml version="1.0"?>',
+            '<methodCall>',
+            '<methodName>',
+            'getLatestBuilds',
+            '</methodName>',
+            '<params>',
+            '<param>',
+            '<value>',
+            '<string>',
+            api_tag,
+            '</string>'
+            '</value>',
+            '</param>',
+            '<param>',
+            '<value>',
+            '<nil/>',
+            '</value>',
+            '</param>',
+            '<param>',
+            '<value>',
+            '<string>',
+            api_tag,
+            '</string>'
+            '</value>',
+            '</param>',
+            '<param>',
+            '<value>',
+            '<nil/>',
+            '</value>',
+            '</param>',
+            '</params>',
+            '</methodCall>'
+        ]
+        xml_req_body = ''.join(xml_req_xml)
+        pkg_data_response = get_data(
+            data_url=FEDORA_PKG_URL,
+            req_data=xml_req_body,
+            content_type='text/xml',
+            req_method='POST'
+        )
+        pkg_data_str = ''.join(
+            pkg_data_response.splitlines()
+        )
+        pkg_pat = re.compile(
+            ''.join(
+                [
+                    '(?<=<name>nvr</name><value><string>)',
+                    '[^\ \/<>]{1,}',
+                    '(?=</string></value>)'
+                ]
+            )
+        )
+        match_obj = re.search(
+            pattern=pkg_pat,
+            string=pkg_data_str
+        )
+        output_str = '{0}'.format(
+            match_obj.group(0)
+        )
     elif linux_name == 'rocky':
         pass
     elif linux_name == 'ubuntu':
