@@ -401,91 +401,95 @@ def get_package_version(target, pkg):
         )
     return output_str
 
-def generate_packages_list(target):
-    # 1. create a list for holding the <package_name=semver> strings.
-    # 2. allocate a list of package names alphabetically in reverse.
-    # 3. interpolate entries with appended " \" line continuations, except [0].
-    # 4. reverse entries and append "\n" to all.
-    # 5. return the resulting list.
-    #
-    pass
-    # dest = target.os
-    # package_func = None
-    # package_manager = None
-    # if dest == 'alpine':
-    #     package_names = [
-    #         'python3',
-    #         'pkgconf',
-    #         'perl',
-    #         'openrc',
-    #         'linux-headers',
-    #         'gawk',
-    #         'curl',
-    #         'alpine-sdk'
-    #     ]
-    #     package_func = get_alpine_package_version
-    #     package_command = [
-    #         'apk update; \\\n',
-    #         '\tapk add \\\n'
-    #     ]
-    # elif dest in ('debian', 'ubuntu'):
-    #     package_names = [
-    #         'python3',
-    #         'pkg-config',
-    #         'perl',
-    #         'gawk',
-    #         'curl',
-    #         'build-essential',
-    #         'apt-transport-https'
-    #     ]
-    #     if dest == 'debian':
-    #         package_func = get_debian_package_version
-    #     elif dest == 'ubuntu':
-    #         package_func = get_ubuntu_package_version
-    #     package_command = [
-    #         'apt-get update; \\\n',
-    #         '\tapt-get -y install --no-install-recommends \\\n'
-    #     ]
-    # elif dest == 'fedora':
-    #     package_names = [
-    #         'python3',
-    #         'pkgconf',
-    #         'perl',
-    #         'make',
-    #         'kernel-devel',
-    #         'glibc'
-    #         'gcc-c++',
-    #         'gcc',
-    #         'gawk',
-    #         'curl-minimal',
-    #         'automake'
-    #     ]
-    #     package_func = get_fedora_package_version
-    #     package_command = 'dnf'
-    # elif dest == 'rocky':
-    #     package_names = [
-    #         'python3',
-    #         'pkgconf',
-    #         'perl',
-    #         'make',
-    #         'glibc',
-    #         'gcc',
-    #         'gawk',
-    #         'curl',
-    #         'automake'
-    #     ]
-    #     package_func = get_rocky_package_version
-    #     package_command = 'yum'
-    # for i, pkg in enumerate(package_names):
-    #     pkg_version = package_func(target.version, pkg)
-    #     if i > 0:
-    #         pkg_string = ''.join(['\t', pkg, '=', pkg_version, ' \\\n'])
-    #     else:
-    #         pkg_string = ''.join(['\t', pkg, '=', pkg_version, '\n'])
-    #     packages.append(pkg_string)
-    # packages.append('RUN {0}')
-    # packages.reverse()
-    # packages[0] = packages[0].replace('\t', '\tdnf -y install ')
+# Generate the list of packages in the Dockerfile.
+def generate_dockerfile_packages_list(target):
+    dest = target.os
+    package_names = None
+    if dest == 'alpine':
+        package_names = [
+            'python3',
+            'pkgconf',
+            'perl',
+            'openrc',
+            'linux-headers',
+            'gawk',
+            'curl',
+            'alpine-sdk'
+        ]
+    elif dest in ('debian', 'ubuntu'):
+        package_names = [
+            'python3',
+            'pkg-config',
+            'perl',
+            'gawk',
+            'curl',
+            'build-essential',
+            'apt-transport-https'
+        ]
+    elif dest == 'fedora':
+        package_names = [
+            'python3',
+            'pkgconf',
+            'perl',
+            'make',
+            'kernel-devel',
+            'glibc'
+            'gcc-c++',
+            'gcc',
+            'gawk',
+            'curl-minimal',
+            'automake'
+        ]
+    elif dest == 'rocky':
+        package_names = [
+            'python3',
+            'pkgconf',
+            'perl',
+            'make',
+            'glibc',
+            'gcc',
+            'gawk',
+            'curl',
+            'automake'
+        ]
+    if package_names is None:
+        # Exit early (failure condition).
+        return None
+    output_list = []
+    # Iterate over the packages and append trailing backslash to all but first.
+    # NOTE: first becomes last after call to str.reverse() on line 482.
+    for i, pkg in enumerate(package_names):
+        pkg_version = get_package_version(target, pkg)
+        pkg_string = [
+            pkg,
+            R'=',
+            pkg_version,
+            R'\\\n'
+        ]
+        if i > 0:
+            output_list.append(R''.join(pkg_string))
+        else:
+            output_list.append(
+                R''.join(
+                    [
+                        pkg_string[1],
+                        pkg_string[2],
+                        pkg_string[3]
+                    ]
+                )
+            )
+    # Reverse packages to be listed in proper alphabetical order.
+    output_list.reverse()
+    # Iterate over the packages and prepend escaped tab to all but first.
+    for i, pkg in enumerate(output_list):
+        if i > 0:
+            output_list[i] = R''.join(
+                [
+                    R'\t',
+                    output_list[i]
+                ]
+            )
+    return output_list
 
 def generate_template(target):
     file_path = '{0}/Dockerfile'.format(target.path)
