@@ -469,15 +469,7 @@ def generate_dockerfile_packages_list(target):
         if i > 0:
             output_list.append(R''.join(pkg_string))
         else:
-            output_list.append(
-                R''.join(
-                    [
-                        pkg_string[1],
-                        pkg_string[2],
-                        pkg_string[3]
-                    ]
-                )
-            )
+            output_list.append(R''.join(pkg_string[1:4]))
     # Reverse packages to be listed in proper alphabetical order.
     output_list.reverse()
     # Iterate over the packages and prepend escaped tab to all but first.
