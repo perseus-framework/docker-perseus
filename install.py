@@ -12,46 +12,50 @@ import re
 import os
 import json
 
-# URLs for accessing data on GitHub.
+# URLs for accessing data hosted on GitHub.
 GH_API_URL='https://api.github.com/repos/'
 GH_RAW_URL='https://raw.githubusercontent.com/'
 
 # URLs for retrieving current versions of Perseus and Rust.
-PERSEUS_URL='{0}framesurge/perseus/releases'.format(GH_API_URL)
-RUST_URL='{0}rust-lang/rust/releases'.format(GH_API_URL)
+PERSEUS_URL='{pfx}framesurge/perseus/releases'.format(pfx=GH_API_URL)
+RUST_URL='{pfx}rust-lang/rust/releases'.format(pfx=GH_API_URL)
 
-# URLs for binary dependencies of Perseus.
-BINARYEN_URL='{0}WebAssembly/binaryen/releases'.format(GH_API_URL)
-BONNIE_URL='{0}arctic-hen7/bonnie/releases'.format(GH_API_URL)
-ESBUILD_URL='{0}evanw/esbuild/releases'.format(GH_API_URL)
-WASM_PACK_URL='{0}rustwasm/wasm-pack/releases'.format(GH_API_URL)
+# URLs for accessing binary dependencies of Perseus.
+BINARYEN_URL='{pfx}WebAssembly/binaryen/releases'.format(pfx=GH_API_URL)
+BONNIE_URL='{pfx}arctic-hen7/bonnie/releases'.format(pfx=GH_API_URL)
+ESBUILD_URL='{pfx}evanw/esbuild/releases'.format(pfx=GH_API_URL)
+WASM_PACK_URL='{pfx}rustwasm/wasm-pack/releases'.format(pfx=GH_API_URL)
 
 # URL for the Docker Hub official image registry.
-HUB_URL='https://hub.docker.com/v2/namespaces/library/repositories/'
+DOCKER_HUB_URL='https://hub.docker.com/v2/namespaces/library/repositories/'
 
 # URLs for retrieving current versions of Linux distributions.
-ALPINE_URL='{0}alpine'.format(HUB_URL)
-DEBIAN_URL='{0}debian'.format(HUB_URL)
-FEDORA_URL='{0}fedora'.format(HUB_URL)
-ROCKY_URL='{0}rockylinux'.format(HUB_URL)
-UBUNTU_URL='{0}ubuntu'.format(HUB_URL)
+ALPINE_URL='{pfx}alpine'.format(pfx=DOCKER_HUB_URL)
+DEBIAN_URL='{pfx}debian'.format(pfx=DOCKER_HUB_URL)
+FEDORA_URL='{pfx}fedora'.format(pfx=DOCKER_HUB_URL)
+ROCKY_URL='{pfx}rockylinux'.format(pfx=DOCKER_HUB_URL)
+UBUNTU_URL='{pfx}ubuntu'.format(pfx=DOCKER_HUB_URL)
 
-# URLs for retrieving current versions of Linux packages.
+# URLs for retrieving current versions of Alpine Linux packages.
 ALPINE_PKG_URL=[
-    '{0}alpinelinux/aports/'.format(GH_RAW_URL),
+    '{pfx}alpinelinux/aports/'.format(pfx=GH_RAW_URL),
     '/main/',
     'APKBUILD'
 ]
 
+# URLs for retrieving current versions of Debian Linux packages.
 DEBIAN_PKG_URL='https://sources.debian.org/api/src/'
 
+# URLs for retrieving current versions of Fedora Linux packages.
 FEDORA_PKG_URL='https://koji.fedoraproject.org/kojihub'
 
+# URLs for retrieving current versions of Rockylinux packages.
 ROCKY_PKG_URL=[
     'https://download.rockylinux.org/pub/rocky/',
     '/devel/source/tree/Packages/'
 ]
 
+# URLs for retrieving current versions of Ubuntu Linux packages.
 UBUNTU_PKG_URL=[
     'https://api.launchpad.net/1.0/ubuntu/+archive/primary',
     '?ws.op=getPublishedSources',
@@ -64,6 +68,7 @@ UBUNTU_PKG_URL=[
     '&source_name='
 ]
 
+# Environment variable default values for use with `docker` CLI.
 PERSEUS_EXAMPLE_DEFAULT='showcase'
 PERSEUS_CLI_DEFAULT='false'
 ESBUILD_TARGET_DEFAULT='es6'
@@ -77,7 +82,7 @@ def os_is_linux():
         return True
     return False
 
-# Retrieve data about the platform of the host.
+# Retrieve platform data from the Linux host in object form.
 def get_local_platform():
     platform_data = SimpleNamespace(
         os=SimpleNamespace(
@@ -91,10 +96,10 @@ def get_local_platform():
     )
     return platform_data
 
-# Request some data from a remote server.
+# Request arbitrary data from a remote server using 'GET' method.
 def get_data(data_url, req_data=None, content_type=None, req_method=None):
     if content_type is not None:
-        req_headers = { 'Content-Type': '{0}'.format(content_type) }
+        req_headers = { 'Content-Type': '{ct}'.format(ct=content_type) }
     elif content_type is None:
         req_headers = { 'Content-Type': 'text/html; charset=utf-8' }
     if req_method is None:
@@ -110,16 +115,17 @@ def get_data(data_url, req_data=None, content_type=None, req_method=None):
     except (HTTPError, URLError) as e:
         if hasattr(e, 'code'):
             print('Server was unable to fulfill request.')
-            print('Error code: {0}'.format(e.code))
+            print('Error code: {ec}'.format(ec=e.code))
         elif hasattr(e, 'reason'):
             print('Server was unreachable.')
-            print('Reason: {0}'.format(e.reason))
+            print('Reason: {er}'.format(er=e.reason))
         return None
     else:
         res_data = res.read().decode('utf-8')
         return res_data
 
 # Convert a JSON object to a SimpleNamespace.
+# This is useful to preserve expected key, value pairs.
 def json_to_namespace(json_obj):
     if json_obj == None:
         return None
@@ -133,7 +139,7 @@ def json_to_namespace(json_obj):
 # Retrieve a list of tags from a remote respository.
 def get_repo_tags(repo_url):
     repo_json = get_data(
-        data_url='{0}'.format(repo_url),
+        data_url='{ru}'.format(ru=repo_url),
         content_type='application/json'
     )
     repo_namespace = json_to_namespace(repo_json)
@@ -155,7 +161,7 @@ def get_latest_distribution(linux_url):
         '{0}'.format(linux_url)
     ).group(0)
     distro_string = get_data(
-        data_url='{0}'.format(linux_url),
+        data_url='{lu}'.format(lu=linux_url),
         content_type='application/json'
     )
     distro_namespace = json_to_namespace(distro_string)
@@ -206,14 +212,14 @@ def get_latest_distribution(linux_url):
     )
     distro_latest = re.search(
         pattern = linux_pattern,
-        string = '{0}'.format(distro_namespace.full_description)
+        string = '{fd}'.format(fd=distro_namespace.full_description)
     ).group(0)
     return distro_latest
 
 # Retrieve the dependency string required for a specific package release.
 def get_package_version(target, pkg):
-    linux_name = '{0}'.format(target.os)
-    linux_channel = '{0}'.format(target.channel)
+    linux_name = '{ln}'.format(ln=target.os)
+    linux_channel = '{lc}'.format(lc=target.channel)
     output_str = None
     if linux_name == 'alpine':
         rel_pat = re.compile('^[0-9]{1,}[\.]{1}[0-9]{1,}')
@@ -222,16 +228,16 @@ def get_package_version(target, pkg):
             pattern=rel_pat,
             string=linux_channel
         )
-        match_str = '{0}{1}'.format(
-            match_obj.group(0),
-            sfx_str
+        match_str = '{m}{sfx}'.format(
+            m=match_obj.group(0),
+            sfx=sfx_str
         )
-        pkg_url = '{0}{1}{2}{3}{4}'.format(
-            ALPINE_PKG_URL[0],
-            match_str,
-            ALPINE_PKG_URL[1],
-            pkg,
-            ALPINE_PKG_URL[2]
+        pkg_url = '{p0}{m}{p1}{pkg}{p2}'.format(
+            p0=ALPINE_PKG_URL[0],
+            m=match_str,
+            p1=ALPINE_PKG_URL[1],
+            pkg=pkg,
+            p2=ALPINE_PKG_URL[2]
         )
         pkg_data_response = get_data(
             data_url=pkg_url
@@ -252,16 +258,16 @@ def get_package_version(target, pkg):
                 string=pkg_data_str
             )
             pkg_semver.append(match_obj.group(0))
-        output_str = '{0}={1}-r{2}'.format(
-            pkg_semver[0],
-            pkg_semver[1],
-            pkg_semver[2]
+        output_str = '{pkg}={ver}-r{rel}'.format(
+            pkg=pkg_semver[0],
+            ver=pkg_semver[1],
+            rel=pkg_semver[2]
         )
     elif linux_name == 'debian':
-        pkg_url = '{0}{1}{2}'.format(
-            DEBIAN_PKG_URL,
-            pkg,
-            '/'
+        pkg_url = '{d}{p}{s}'.format(
+            d=DEBIAN_PKG_URL,
+            p=pkg,
+            s='/'
         )
         pkg_data_response = get_data(
             data_url=pkg_url,
@@ -281,16 +287,16 @@ def get_package_version(target, pkg):
             pattern=pkg_pat,
             string=pkg_data_response
         )
-        output_str = '{0}'.format(
-            match_obj.group(0)
+        output_str = '{m}'.format(
+            m=match_obj.group(0)
         )
     elif linux_name == 'fedora':
         pfx_str = 'f'
         sfx_str = '-updates'
-        api_tag = '{0}{1}{2}'.format(
-            pfx_str,
-            linux_channel,
-            sfx_str
+        api_tag = '{pfx}{lc}{sfx}'.format(
+            pfx=pfx_str,
+            lc=linux_channel,
+            sfx=sfx_str
         )
         xml_req_xml = '''
 <?xml version="1.0"?><methodCall><methodName>getLatestBuilds</methodName><params><param><value><string>%%API_TAG%%</string></value></param><param><value><nil/></value></param><param><value><string>%%API_TAG%%</string></value></param><param><value><nil/></value></param></params></methodCall>
@@ -321,8 +327,8 @@ def get_package_version(target, pkg):
             pattern=pkg_pat,
             string=pkg_data_str
         )
-        output_str = '{0}'.format(
-            match_obj.group(0)
+        output_str = '{m}'.format(
+            m=match_obj.group(0)
         )
     elif linux_name == 'rocky':
         api_pat = re.compile(
@@ -336,11 +342,11 @@ def get_package_version(target, pkg):
             match_obj.group(0)
         )
         api_dir = pkg[0]
-        pkg_url = '{0}{1}{2}{3}'.format(
-            ROCKY_PKG_URL[0],
-            match_str,
-            ROCKY_PKG_URL[1],
-            api_dir
+        pkg_url = '{p0}{m}{p1}{a}'.format(
+            p0=ROCKY_PKG_URL[0],
+            m=match_str,
+            p1=ROCKY_PKG_URL[1],
+            a=api_dir
         )
         pkg_data_response = get_data(
             data_url=pkg_url,
@@ -364,13 +370,13 @@ def get_package_version(target, pkg):
             pattern=pkg_pat,
             string=pkg_data_str
         )
-        output_str = '{0}'.format(
-            match_obj.group(0)
+        output_str = '{m}'.format(
+            m=match_obj.group(0)
         )
     elif linux_name == 'ubuntu':
-        pkg_url = '{0}{1}'.format(
-            ''.join(UBUNTU_PKG_URL),
-            pkg
+        pkg_url = '{pu}{pkg}'.format(
+            pu=''.join(UBUNTU_PKG_URL),
+            pkg=pkg
         ).replace(
             '%%DISTRO_SERIES%%',
             linux_channel
@@ -386,12 +392,12 @@ def get_package_version(target, pkg):
             pattern=pkg_pat,
             string=pkg_data_response
         )
-        match_str = '{0}'.format(
-            match_obj.group(0)
+        match_str = '{m}'.format(
+            m=match_obj.group(0)
         )
         pkg_ns = json_to_namespace(match_str)
-        output_str = '{0}'.format(
-            pkg_ns.source_package_version
+        output_str = '{spv}'.format(
+            spv=pkg_ns.source_package_version
         )
     return output_str
 
