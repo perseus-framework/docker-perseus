@@ -401,7 +401,7 @@ def get_package_version(target, pkg):
         )
     return output_str
 
-# Generate the list of packages in the Dockerfile.
+# Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
     dest = target.os
     package_names = None
@@ -457,31 +457,50 @@ def generate_dockerfile_packages_list(target):
         return None
     output_list = []
     # Iterate over the packages and append trailing backslash to all but first.
-    # NOTE: first becomes last after call to str.reverse() on line 482.
+    # NOTE: first becomes last after call to str.reverse() below.
     for i, pkg in enumerate(package_names):
         pkg_version = get_package_version(target, pkg)
         pkg_string = [
+            R'\t',
             pkg,
             R'=',
             pkg_version,
-            R' \\\n'
+            R' \\'
         ]
+        # Append a semicolon after the first (actually last) item.
+        # NOTE: This is required syntax when using a multi-line compound
+        # command statement in shell script.
         if i > 0:
-            output_list.append(R''.join(pkg_string))
-        else:
-            output_list.append(R''.join(pkg_string[0:3]))
+            pkg_string[3] = R';'
+        output_list.append(R''.join(pkg_string))
     # Reverse packages to be listed in proper alphabetical order.
     output_list.reverse()
-    # Iterate over the packages and prepend escaped tab to all but first.
-    for i, pkg in enumerate(output_list):
-        if i > 0:
-            output_list[i] = R''.join(
-                [
-                    R'\t',
-                    output_list[i]
-                ]
-            )
     return output_list
+
+def get_package_install_commands(target):
+    linux_name = '{ln}'.format(ln=target.os)
+    output_command_list = None
+    if linux_name == 'alpine':
+        output_command_list = [
+            R'RUN apk update; \\',
+            R'\tapk add \\'
+        ]
+    elif linux_name in ('debian', 'ubuntu'):
+        output_command_list = [
+            R'RUN apt-get update; \\',
+            R'\tapt-get -y --no-install-recommends install \\'
+        ]
+    elif linux_name == 'fedora':
+        output_command_list = [
+            R'RUN dnf -y update; \\',
+            R'\tdnf -y --allowerasing --nodocs install \\'
+        ]
+    elif linux_name == 'rocky':
+        output_command_list = [
+            R'RUN microdnf -y update; \\',
+            R'\tmicrodnf -y --nodocs install \\'
+        ]
+    return output_command_list
 
 def generate_template(target):
     file_path = '{0}/Dockerfile'.format(target.path)
