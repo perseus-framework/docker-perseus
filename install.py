@@ -456,8 +456,8 @@ def generate_dockerfile_packages_list(target):
         # Exit early (failure condition).
         return None
     output_list = []
-    # Iterate over the packages and append trailing backslash to all but first.
-    # NOTE: first becomes last after call to str.reverse() below.
+    # Iterate over the packages and prepend tab, append backslash.
+    # NOTE: first item becomes last item after call to str.reverse() below.
     for i, pkg in enumerate(package_names):
         pkg_version = get_package_version(target, pkg)
         pkg_string = [
@@ -470,8 +470,8 @@ def generate_dockerfile_packages_list(target):
         # Append a semicolon after the first (actually last) item.
         # NOTE: This is required syntax when using a multi-line compound
         # command statement in shell script.
-        if i > 0:
-            pkg_string[3] = R';'
+        if i == 0:
+            pkg_string[4] = R';'
         output_list.append(R''.join(pkg_string))
     # Reverse packages to be listed in proper alphabetical order.
     output_list.reverse()
