@@ -464,7 +464,7 @@ def generate_dockerfile_packages_list(target):
             pkg,
             R'=',
             pkg_version,
-            R'\\\n'
+            R' \\\n'
         ]
         if i > 0:
             output_list.append(R''.join(pkg_string))
