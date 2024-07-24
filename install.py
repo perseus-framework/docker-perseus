@@ -298,6 +298,7 @@ def get_package_version(target, pkg):
             lc=linux_channel,
             sfx=sfx_str
         )
+        # Format our request as an XML heredoc that Fedora's API can consume.
         xml_req_xml = '''
 <?xml version="1.0"?><methodCall><methodName>getLatestBuilds</methodName><params><param><value><string>%%API_TAG%%</string></value></param><param><value><nil/></value></param><param><value><string>%%API_TAG%%</string></value></param><param><value><nil/></value></param></params></methodCall>
 '''
