@@ -25,6 +25,7 @@ BINARYEN_URL='{pfx}WebAssembly/binaryen/releases'.format(pfx=GH_API_URL)
 BONNIE_URL='{pfx}arctic-hen7/bonnie/releases'.format(pfx=GH_API_URL)
 ESBUILD_URL='{pfx}evanw/esbuild/releases'.format(pfx=GH_API_URL)
 WASM_PACK_URL='{pfx}rustwasm/wasm-pack/releases'.format(pfx=GH_API_URL)
+RUSTUP_URL='https://sh.rustup.rs/'
 
 # URL for the Docker Hub official image registry.
 DOCKER_HUB_URL='https://hub.docker.com/v2/namespaces/library/repositories/'
@@ -472,11 +473,19 @@ def generate_dockerfile_packages_list(target):
         # NOTE: This is required syntax when using a multi-line compound
         # command statement in shell script.
         if i == 0:
-            pkg_string[4] = R';'
+            pkg_string[4] = R'; \\'
         output_list.append(R''.join(pkg_string))
     # Reverse packages to be listed in proper alphabetical order.
     output_list.reverse()
     return output_list
+
+def generate_rustup_commands():
+    output_command_list = [
+        R'\tcurl %s -sSf | sh -s -- -y; \\' % (RUSTUP_URL),
+        R'\trustup target add "${WASM_TARGET};"',
+        R''
+    ]
+    return output_command_list
 
 def get_package_install_commands(target):
     linux_name = '{ln}'.format(ln=target.os)
@@ -501,10 +510,11 @@ def get_package_install_commands(target):
             R'RUN microdnf -y update; \\',
             R'\tmicrodnf -y --nodocs install \\'
         ]
+    output_command_list.insert(0, '# Install build dependencies.')
     return output_command_list
 
 def generate_template(target):
-    file_path = '{tp}/Dockerfile'.format(tp=target.path)
+    file_path = R'%s/Dockerfile' % (target.path)
     if not os.path.isfile(file_path):
         f = open(file=file_path, mode='w')
         dockerfile_from = [
@@ -552,11 +562,10 @@ def generate_template(target):
                 (CARGO_NET_DEFAULT),
             R''
         ]
-        dockerfile_contents = [
-            '# Work from the root of the container.\n',
-            'WORKDIR /\n',
-            '\n'
-            '# Install build dependencies.'
+        dockerfile_base_workdir = [
+            R'# Work from the root of the container.',
+            R'WORKDIR /',
+            R''
         ]
         
         # TODO: write list concatenation.
