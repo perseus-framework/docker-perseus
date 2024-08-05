@@ -516,12 +516,12 @@ def generate_dockerfile_base_run(target):
     return output_base_run
 
 def generate_rustup_commands():
-    output_command_list = [
+    output_rustup = [
         R'\tcurl %s -sSf | sh -s -- -y --target %s;' % \
             (RUSTUP_URL, WASM_TARGET_DEFAULT),
         R''
     ]
-    return output_command_list
+    return output_rustup
 
 def generate_dockerfile_from_base(target):
     output_from_base = [
