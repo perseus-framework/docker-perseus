@@ -581,17 +581,12 @@ def generate_dockerfile_base_workdir():
     return output_base_workdir
 
 def generate_template(target):
-    file_path = R'%s/Dockerfile' % (target.path)
-    if not os.path.isfile(file_path):
-        f = open(file=file_path, mode='w')
-        dockerfile_base_workdir = [
-            R'# Work from the root of the container.',
-            R'WORKDIR /',
-            R''
-        ]
-        
-        # TODO: write list concatenation.
-        f.writelines(dockerfile_contents)
+    pass
+    # file_path = R'%s/Dockerfile' % (target.path)
+    # if not os.path.isfile(file_path):
+    #     f = open(file=file_path, mode='w')
+    #     # TODO: write list concatenation.
+    #     f.writelines(dockerfile_contents)
 
 def generate_directory(dir_path):
     if not os.path.exists(dir_path):
