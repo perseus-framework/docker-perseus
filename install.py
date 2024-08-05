@@ -479,32 +479,39 @@ def generate_dockerfile_packages_list(target):
     output_list.reverse()
     return output_list
 
-# TODO: Refactor Docker RUN and Dockerfile comment out of this function
-def generate_package_install_commands(target):
+# Output all build dependency commands required for the base image.
+def generate_dockerfile_base_run(target):
     linux_name = '{ln}'.format(ln=target.os)
-    output_command_list = None
     if linux_name == 'alpine':
-        output_command_list = [
+        base_run = [
             R'RUN apk update; \\',
             R'\tapk add \\'
         ]
     elif linux_name in ('debian', 'ubuntu'):
-        output_command_list = [
+        base_run = [
             R'RUN apt-get update; \\',
             R'\tapt-get -y --no-install-recommends install \\'
         ]
     elif linux_name == 'fedora':
-        output_command_list = [
+        base_run = [
             R'RUN dnf -y update; \\',
             R'\tdnf -y --allowerasing --nodocs install \\'
         ]
     elif linux_name == 'rocky':
-        output_command_list = [
+        base_run = [
             R'RUN microdnf -y update; \\',
             R'\tmicrodnf -y --nodocs install \\'
         ]
-    output_command_list.insert(0, '# Install build dependencies.')
-    return output_command_list
+    if base_run is None:
+        # Failure condition.
+        return None
+    pkg_list = generate_dockerfile_packages_list(target)
+    output_base_run = [
+        R'# Install build dependencies.',
+        *base_run,
+        *pkg_list
+    ]
+    return output_base_run
 
 def generate_rustup_commands():
     output_command_list = [
