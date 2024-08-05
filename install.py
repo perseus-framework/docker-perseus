@@ -479,14 +479,6 @@ def generate_dockerfile_packages_list(target):
     output_list.reverse()
     return output_list
 
-def generate_rustup_commands():
-    output_command_list = [
-        R'\tcurl %s -sSf | sh -s -- -y; \\' % (RUSTUP_URL),
-        R'\trustup target add "${WASM_TARGET};"',
-        R''
-    ]
-    return output_command_list
-
 def get_package_install_commands(target):
     linux_name = '{ln}'.format(ln=target.os)
     output_command_list = None
@@ -511,6 +503,14 @@ def get_package_install_commands(target):
             R'\tmicrodnf -y --nodocs install \\'
         ]
     output_command_list.insert(0, '# Install build dependencies.')
+    return output_command_list
+
+def generate_rustup_commands():
+    output_command_list = [
+        R'\tcurl %s -sSf | sh -s -- -y --target %s;' % \
+            (RUSTUP_URL, WASM_TARGET_DEFAULT),
+        R''
+    ]
     return output_command_list
 
 def generate_template(target):
