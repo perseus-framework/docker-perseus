@@ -539,36 +539,44 @@ def generate_dockerfile_args():
     ]
     return output_args
 
+def generate_dockerfile_env_vars():
+    output_env_vars = [
+        R'# Export environment variables.',
+        R'# NOTE: Setting PERSEUS_CLI_SEQUENTIAL to true',
+        R'# is required for low memory environments.',
+        R'ENV EXAMPLE_NAME=${EXAMPLE_NAME:-%s} \\' % \
+            (PERSEUS_EXAMPLE_DEFAULT),
+        R'\tPERSEUS_VERSION=${PERSEUS_VERSION:-%s} \\' % \
+            (get_repo_latest_tag(PERSEUS_URL)),
+        R'\tPERSEUS_CLI_SEQUENTIAL=${PERSEUS_CLI_SEQUENTIAL:-%s} \\' % \
+            (PERSEUS_CLI_DEFAULT),
+        R'\tBINARYEN_VERSION=${BINARYEN_VERSION:-%s} \\' % \
+            (get_repo_latest_tag(BINARYEN_URL)),
+        R'\tBONNIE_VERSION=${BONNIE_VERSION:-%s} \\' % \
+            (get_repo_latest_tag(BONNIE_URL)),
+        R'\tESBUILD_VERSION=${ESBUILD_VERSION:-%s} \\' % \
+            (get_repo_latest_tag(ESBUILD_URL)),
+        R'\tESBUILD_TARGET=${ESBUILD_TARGET:-%s} \\' % \
+            (ESBUILD_TARGET_DEFAULT),
+        R'\tWASM_PACK_VERSION=${WASM_PACK_VERSION:-%s} \\' % \
+            (get_repo_latest_tag(WASM_PACK_URL)),
+        R'\tWASM_TARGET=${WASM_TARGET:-%s} \\' % \
+            (WASM_TARGET_DEFAULT),
+        R'\t%s=%s%s%s' % \
+            ( \
+                R'CARGO_NET_GIT_FETCH_WITH_CLI', \
+                R'${CARGO_NET_GIT_FETCH_WITH_CLI:-', \
+                CARGO_NET_DEFAULT, \
+                R'}' \
+            ),
+        R''
+    ]
+    return output_env_vars
+
 def generate_template(target):
     file_path = R'%s/Dockerfile' % (target.path)
     if not os.path.isfile(file_path):
         f = open(file=file_path, mode='w')
-        dockerfile_env_vars = [
-            R'# Export environment variables.',
-            R'# NOTE: Setting PERSEUS_CLI_SEQUENTIAL to true',
-            R'# is required for low memory environments.',
-            R'ENV EXAMPLE_NAME=${EXAMPLE_NAME:-%s} \\' % \
-                (PERSEUS_EXAMPLE_DEFAULT),
-            R'\tPERSEUS_VERSION=${PERSEUS_VERSION:-%s} \\' % \
-                (get_repo_latest_tag(PERSEUS_URL)),
-            R'\tPERSEUS_CLI_SEQUENTIAL=${PERSEUS_CLI_SEQUENTIAL:-%s} \\' % \
-                (PERSEUS_CLI_DEFAULT),
-            R'\tBINARYEN_VERSION=${BINARYEN_VERSION:-%s} \\' % \
-                (get_repo_latest_tag(BINARYEN_URL)),
-            R'\tBONNIE_VERSION=${BONNIE_VERSION:-%s} \\' % \
-                (get_repo_latest_tag(BONNIE_URL)),
-            R'\tESBUILD_VERSION=${ESBUILD_VERSION:-%s} \\' % \
-                (get_repo_latest_tag(ESBUILD_URL)),
-            R'\tESBUILD_TARGET=${ESBUILD_TARGET:-%s} \\' % \
-                (ESBUILD_TARGET_DEFAULT),
-            R'\tWASM_PACK_VERSION=${WASM_PACK_VERSION:-%s} \\' % \
-                (get_repo_latest_tag(WASM_PACK_URL)),
-            R'\tWASM_TARGET=${WASM_TARGET:-%s} \\' % \
-                (WASM_TARGET_DEFAULT),
-            R'\tCARGO_NET_GIT_FETCH_WITH_CLI=${CARGO_NET_GIT_FETCH_WITH_CLI:-%s};' % \
-                (CARGO_NET_DEFAULT),
-            R''
-        ]
         dockerfile_base_workdir = [
             R'# Work from the root of the container.',
             R'WORKDIR /',
