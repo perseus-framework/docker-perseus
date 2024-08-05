@@ -678,6 +678,21 @@ def generate_dockerfile_esbuild():
     ]
     return output_esbuild
 
+def generate_dockerfile_wasm_pack():
+    output_wasm_pack = [
+        R'# Create a build stage for `wasm-pack` that we can run in parallel.',
+        R'FROM base AS wasm-pack',
+        R'',
+        R'# Work from the chosen install path for `wasm-pack`.',
+        R'WORKDIR /wasm-pack',
+        R'',
+        R'# Install crate `wasm-pack` into the work path.',
+        R'RUN cargo install wasm-pack --version ${WASM_PACK_VERSION}; \\',
+        R'\tmv /usr/local/cargo/bin/wasm-pack .;',
+        R''
+    ]
+    return output_wasm_pack
+
 def generate_template(target):
     pass
     # file_path = R'%s/Dockerfile' % (target.path)
