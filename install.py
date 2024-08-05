@@ -631,6 +631,21 @@ def generate_dockerfile_binaryen():
     ]
     return output_binaryen
 
+def generate_dockerfile_bonnie():
+    output_bonnie = [
+        R'# Create a build stage for `bonnie` we can run in parallel.',
+        R'FROM base AS bonnie',
+        R'',
+        R'# Work from the chosen install path for `bonnie`.',
+        R'WORKDIR /bonnie',
+        R'',
+        R'# Install crate `bonnie` into the work path.',
+        R'RUN cargo install bonnie --version ${BONNIE_VERSION}; \\',
+        R'\tmv /usr/local/cargo/bin/bonnie .;',
+        R''
+    ]
+    return output_bonnie
+
 def generate_template(target):
     pass
     # file_path = R'%s/Dockerfile' % (target.path)
