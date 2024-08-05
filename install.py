@@ -514,13 +514,13 @@ def generate_rustup_commands():
     ]
     return output_command_list
 
-def generate_dockerfile_from(target):
-    output_from = [
+def generate_dockerfile_from_base(target):
+    output_from_base = [
         R'# Pull base image',
         R'FROM %s AS base' % (target.tag),
         R''
     ]
-    return output_from
+    return output_from_base
 
 def generate_dockerfile_args():
     output_args = [
