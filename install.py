@@ -479,7 +479,8 @@ def generate_dockerfile_packages_list(target):
     output_list.reverse()
     return output_list
 
-def get_package_install_commands(target):
+# TODO: Refactor Docker RUN and Dockerfile comment out of this function
+def generate_package_install_commands(target):
     linux_name = '{ln}'.format(ln=target.os)
     output_command_list = None
     if linux_name == 'alpine':
