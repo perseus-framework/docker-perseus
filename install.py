@@ -514,15 +514,18 @@ def generate_rustup_commands():
     ]
     return output_command_list
 
+def generate_dockerfile_from(target):
+    output_from = [
+        R'# Pull base image',
+        R'FROM %s AS base' % (target.tag),
+        R''
+    ]
+    return output_from
+
 def generate_template(target):
     file_path = R'%s/Dockerfile' % (target.path)
     if not os.path.isfile(file_path):
         f = open(file=file_path, mode='w')
-        dockerfile_from = [
-            R'# Pull base image',
-            R'FROM %s AS base' % (target.tag),
-            R''
-        ]
         dockerfile_args = [
             R'# Define optional arguments we can pass to `docker`.',
             R'ARG EXAMPLE_NAME \\',
