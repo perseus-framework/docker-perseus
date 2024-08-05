@@ -573,6 +573,13 @@ def generate_dockerfile_env_vars():
     ]
     return output_env_vars
 
+def generate_dockerfile_base_workdir():
+    output_base_workdir = [
+        R'# Work from the root of the container.',
+        R'WORKDIR /'
+    ]
+    return output_base_workdir
+
 def generate_template(target):
     file_path = R'%s/Dockerfile' % (target.path)
     if not os.path.isfile(file_path):
