@@ -596,7 +596,6 @@ def generate_dockerfile_base(target):
     env_vars = generate_dockerfile_env_vars()
     base_workdir = generate_dockerfile_base_workdir()
     base_run = generate_dockerfile_base_run(target)
-    # TODO: Add build dependencies here.
     output_dockerfile_base = [
         *from_base,
         *args,
@@ -605,6 +604,10 @@ def generate_dockerfile_base(target):
         *base_run
     ]
     return output_dockerfile_base
+
+def generate_dockerfile_binaryen():
+    # TODO: populate logic of this function.
+    pass
 
 def generate_template(target):
     pass
