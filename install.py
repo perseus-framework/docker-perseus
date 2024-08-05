@@ -576,9 +576,24 @@ def generate_dockerfile_env_vars():
 def generate_dockerfile_base_workdir():
     output_base_workdir = [
         R'# Work from the root of the container.',
-        R'WORKDIR /'
+        R'WORKDIR /',
+        R''
     ]
     return output_base_workdir
+
+def generate_dockerfile_base(target):
+    from_base = generate_dockerfile_from_base(target)
+    args = generate_dockerfile_args()
+    env_vars = generate_dockerfile_env_vars()
+    base_workdir = generate_dockerfile_base_workdir()
+    # TODO: Add build dependencies here.
+    output_dockerfile_base = [
+        *from_base,
+        *args,
+        *env_vars,
+        *base_workdir
+    ]
+    return output_dockerfile_base
 
 def generate_template(target):
     pass
