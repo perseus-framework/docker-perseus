@@ -506,10 +506,12 @@ def generate_dockerfile_base_run(target):
         # Failure condition.
         return None
     pkg_list = generate_dockerfile_packages_list(target)
+    rustup_commands = generate_rustup_commands()
     output_base_run = [
         R'# Install build dependencies.',
         *base_run,
-        *pkg_list
+        *pkg_list,
+        *rustup_commands
     ]
     return output_base_run
 
@@ -593,12 +595,14 @@ def generate_dockerfile_base(target):
     args = generate_dockerfile_args()
     env_vars = generate_dockerfile_env_vars()
     base_workdir = generate_dockerfile_base_workdir()
+    base_run = generate_dockerfile_base_run(target)
     # TODO: Add build dependencies here.
     output_dockerfile_base = [
         *from_base,
         *args,
         *env_vars,
-        *base_workdir
+        *base_workdir,
+        *base_run
     ]
     return output_dockerfile_base
 
