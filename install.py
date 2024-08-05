@@ -693,6 +693,10 @@ def generate_dockerfile_wasm_pack():
     ]
     return output_wasm_pack
 
+def generate_dockferfile_framework():
+    pass
+    # TODO: populate logic of this function.
+
 def generate_template(target):
     pass
     # file_path = R'%s/Dockerfile' % (target.path)
