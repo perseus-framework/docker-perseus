@@ -522,24 +522,27 @@ def generate_dockerfile_from(target):
     ]
     return output_from
 
+def generate_dockerfile_args():
+    output_args = [
+        R'# Define optional arguments we can pass to `docker`.',
+        R'ARG EXAMPLE_NAME \\',
+        R'\tPERSEUS_VERSION \\',
+        R'\tPERSEUS_CLI_SEQUENTIAL \\',
+        R'\tBINARYEN_VERSION \\',
+        R'\tBONNIE_VERSION \\',
+        R'\tESBUILD_VERSION \\',
+        R'\tESBUILD_TARGET \\',
+        R'\tWASM_PACK_VERSION \\',
+        R'\tWASM_TARGET \\',
+        R'\tCARGO_NET_GIT_FETCH_WITH_CLI \\',
+        '',
+    ]
+    return output_args
+
 def generate_template(target):
     file_path = R'%s/Dockerfile' % (target.path)
     if not os.path.isfile(file_path):
         f = open(file=file_path, mode='w')
-        dockerfile_args = [
-            R'# Define optional arguments we can pass to `docker`.',
-            R'ARG EXAMPLE_NAME \\',
-            R'\tPERSEUS_VERSION \\',
-            R'\tPERSEUS_CLI_SEQUENTIAL \\',
-            R'\tBINARYEN_VERSION \\',
-            R'\tBONNIE_VERSION \\',
-            R'\tESBUILD_VERSION \\',
-            R'\tESBUILD_TARGET \\',
-            R'\tWASM_PACK_VERSION \\',
-            R'\tWASM_TARGET \\',
-            R'\tCARGO_NET_GIT_FETCH_WITH_CLI \\',
-            '',
-        ]
         dockerfile_env_vars = [
             R'# Export environment variables.',
             R'# NOTE: Setting PERSEUS_CLI_SEQUENTIAL to true',
