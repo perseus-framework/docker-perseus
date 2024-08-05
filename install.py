@@ -572,11 +572,11 @@ def generate_dockerfile_env_vars():
         R'\tWASM_TARGET=${WASM_TARGET:-%s} \\' % \
             (WASM_TARGET_DEFAULT),
         R'\t%s=%s%s%s' % \
-            ( \
-                R'CARGO_NET_GIT_FETCH_WITH_CLI', \
-                R'${CARGO_NET_GIT_FETCH_WITH_CLI:-', \
-                CARGO_NET_DEFAULT, \
-                R'}' \
+            (
+                R'CARGO_NET_GIT_FETCH_WITH_CLI',
+                R'${CARGO_NET_GIT_FETCH_WITH_CLI:-',
+                CARGO_NET_DEFAULT,
+                R'}'
             ),
         R''
     ]
@@ -606,7 +606,6 @@ def generate_dockerfile_base(target):
     return output_dockerfile_base
 
 def generate_dockerfile_binaryen():
-    # TODO: populate logic of this function.
     output_binaryen = [
         R'# Create a build stage for `binaryen` we can run in parallel.',
         R'FROM base AS binaryen',
@@ -620,9 +619,9 @@ def generate_dockerfile_binaryen():
         R'\t-Lo binaryen-${BINARYEN_VERSION}.tar.gz \\',
         R'\t%s%s%s; \\' % \
         (
-            BINARYEN_URL, \
-            R'/download/version_${BINARYEN_VERSION}', \
-            R'/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz' \
+            BINARYEN_URL,
+            R'/download/version_${BINARYEN_VERSION}',
+            R'/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz'
         ),
         R'\ttar \\',
         R'\t--strip-components=1 \\',
