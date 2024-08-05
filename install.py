@@ -479,6 +479,14 @@ def generate_dockerfile_packages_list(target):
     output_list.reverse()
     return output_list
 
+def generate_rustup_commands():
+    output_rustup = [
+        R'\tcurl %s -sSf | sh -s -- -y --target %s;' % \
+            (RUSTUP_URL, WASM_TARGET_DEFAULT),
+        R''
+    ]
+    return output_rustup
+
 # Output all build dependency commands required for the base image.
 def generate_dockerfile_base_run(target):
     linux_name = '{ln}'.format(ln=target.os)
@@ -514,14 +522,6 @@ def generate_dockerfile_base_run(target):
         *rustup_commands
     ]
     return output_base_run
-
-def generate_rustup_commands():
-    output_rustup = [
-        R'\tcurl %s -sSf | sh -s -- -y --target %s;' % \
-            (RUSTUP_URL, WASM_TARGET_DEFAULT),
-        R''
-    ]
-    return output_rustup
 
 def generate_dockerfile_from_base(target):
     output_from_base = [
