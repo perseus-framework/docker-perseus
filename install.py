@@ -625,7 +625,7 @@ def generate_dockerfile_binaryen():
         ),
         R'\ttar \\',
         R'\t--strip-components=1 \\',
-        R'\t-xzf binaryen-${BINARYEN_VERSION}.tar.gz; \\'
+        R'\t-xzf binaryen-${BINARYEN_VERSION}.tar.gz; \\',
         R'\trm -f binaryen-${BINARYEN_VERSION}.tar.gz;',
         R''
     ]
@@ -645,6 +645,38 @@ def generate_dockerfile_bonnie():
         R''
     ]
     return output_bonnie
+
+def generate_dockerfile_esbuild():
+    es_pat = re.compile('.*(?=/releases)')
+    es_match = re.search(
+        pattern=es_pat,
+        string=ESBUILD_URL
+    )
+    ESBUILD_ROOT = R'%s' % (es_match.group(0))
+    output_esbuild = [
+        R'# Create a build stage for `esbuild` we can run in parallel.',
+        R'FROM base AS esbuild',
+        R'',
+        R'# Work from the chosen install path for `esbuild`.',
+        R'WORKDIR /esbuild',
+        R'',
+        R'# Download, extract, and remove compressed tar of `esbuild`.',
+        R'RUN curl \\',
+        R'\t--progress-bar \\',
+        R'\t-Lo esbuild-${ESBUILD_VERSION}.tar.gz \\',
+        R'\t%s%s%s; \\' % \
+        (
+            ESBUILD_ROOT,
+            '/tarball',
+            '/${ESBUILD_VERSION}'
+        ),
+        R'\ttar \\',
+        R'\t--strip-components=1 \\',
+        R'\t-xzf esbuild-${ESBUILD_VERSION}.tar.gz; \\',
+        R'\trm -f esbuild-${ESBUILD_VERSION}.tar.gz;',
+        R''
+    ]
+    return output_esbuild
 
 def generate_template(target):
     pass
