@@ -414,6 +414,7 @@ def generate_dockerfile_packages_list(target):
             'perl',
             'openrc',
             'linux-headers',
+            'git',
             'gawk',
             'curl',
             'alpine-sdk'
@@ -423,6 +424,7 @@ def generate_dockerfile_packages_list(target):
             'python3',
             'pkg-config',
             'perl',
+            'git',
             'gawk',
             'curl',
             'build-essential',
@@ -435,7 +437,8 @@ def generate_dockerfile_packages_list(target):
             'perl',
             'make',
             'kernel-devel',
-            'glibc'
+            'glibc',
+            'git',
             'gcc-c++',
             'gcc',
             'gawk',
@@ -449,6 +452,7 @@ def generate_dockerfile_packages_list(target):
             'perl',
             'make',
             'glibc',
+            'git',
             'gcc',
             'gawk',
             'curl',
