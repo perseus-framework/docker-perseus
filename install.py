@@ -738,10 +738,10 @@ def generate_dockerfile_builder():
     # TODO: populate logic required to prepare and build arbitrary app.
     return output_builder
 
-def generate_dockerfile_deploy_image():
+def generate_dockerfile_deploy_image(target):
     output_deploy_image = [
         R'# Prepare the final image where the app will be deployed.',
-        R'FROM %%LINUX%%',
+        R'FROM %s' % (target.tag),
         R'',
         R'# Work from a chosen install path for the deployed app.',
         R'WORKDIR /app',
@@ -756,7 +756,6 @@ def generate_dockerfile_deploy_image():
         R'# Configure the container to serve the deployed app while running.',
         R'CMD ["./server"]'
     ]
-    # TODO: populate logic required to use proper linux tag and arbitrary app.
     return output_deploy_image
 
 def generate_template(target):
