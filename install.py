@@ -731,8 +731,29 @@ def generate_dockerfile_builder():
         R'WORKDIR /perseus/examples/fetching',
         R''
     ]
-    # TODO: populate logic required to prepare and build app.
+    # TODO: populate logic required to prepare and build arbitrary app.
     return output_builder
+
+def generate_dockerfile_deploy_image():
+    output_deploy_image = [
+        R'# Prepare the final image where the app will be deployed.',
+        R'FROM %%LINUX%%',
+        R'',
+        R'# Work from a chosen install path for the deployed app.',
+        R'WORKDIR /app',
+        R''
+        R'# Copy the app into its chosen install path.',
+        R'COPY --from=builder /perseus/examples/fetching/pkg /app/',
+        R'',
+        R'# Bind the server to `localhost` and the container to port 8080.',
+        R'ENV PERSEUS_HOST=0.0.0.0 \\',
+        R'\tPERSEUS_PORT=8080',
+        R'',
+        R'# Configure the container to serve the deployed app while running.',
+        R'CMD ["./server"]'
+    ]
+    # TODO: populate logic required to use proper linux tag and arbitrary app.
+    return output_deploy_image
 
 def generate_template(target):
     pass
