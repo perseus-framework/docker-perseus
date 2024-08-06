@@ -714,6 +714,26 @@ def generate_dockerfile_perseus_cli():
     ]
     return output_perseus_cli
 
+def generate_dockerfile_builder():
+    output_builder = [
+        R'# Create a build stage for building our app we can run in parallel.',
+        R'FROM framework AS builder',
+        R'',
+        R'# Copy the tools we previously prepared in parallel.',
+        R'COPY --from=binaryen /binaryen/bin/ /usr/bin/',
+        R'COPY --from=binaryen /binaryen/include/ /usr/include/',
+        R'COPY --from=binaryen /binary/lib/ /usr/lib/',
+        R'COPY --from=esbuild /esbuild/bin/esbuild /usr/bin/',
+        R'COPY --perseus-cli /perseus/target/release/perseus /usr/bin/',
+        R'COPY --from=wasm-pack /wasm-pack/wasm-pack /usr/ibn/',
+        R'',
+        R'# Work from the root of our app.',
+        R'WORKDIR /perseus/examples/fetching',
+        R''
+    ]
+    # TODO: populate logic required to prepare and build app.
+    return output_builder
+
 def generate_template(target):
     pass
     # file_path = R'%s/Dockerfile' % (target.path)
