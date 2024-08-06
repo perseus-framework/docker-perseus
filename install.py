@@ -697,6 +697,23 @@ def generate_dockferfile_framework():
     pass
     # TODO: populate logic of this function.
 
+def generate_dockerfile_perseus_cli():
+    output_perseus_cli = [
+        R'# Create a build stage for `perseus-cli` we can run in parallel.',
+        R'FROM framework AS perseus-cli',
+        R'',
+        R'# Copy `bonnie` to satisfy implementation.',
+        R'COPY --from=bonnie /bonnie/bonnie /usr/bin/',
+        R'',
+        R'# Work from the root of the codebase.',
+        R'WORKDIR /perseus',
+        R'',
+        R'# Compile the release binary target of package `perseus-cli`.',
+        R'RUN bonnie setup',
+        R''
+    ]
+    return output_perseus_cli
+
 def generate_template(target):
     pass
     # file_path = R'%s/Dockerfile' % (target.path)
