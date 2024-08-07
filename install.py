@@ -739,7 +739,7 @@ def generate_dockerfile_builder():
     # TODO: populate logic required to prepare and build arbitrary app.
     return output_builder
 
-def generate_dockerfile_deploy_image(target):
+def generate_dockerfile_app(target):
     output_deploy_image = [
         R'# Prepare the final image where the app will be deployed.',
         R'FROM %s' % (target.tag),
