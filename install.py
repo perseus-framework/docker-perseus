@@ -784,11 +784,7 @@ def generate_dockerfile_app(target):
     ]
     return output_deploy_image
 
-def patch_framework():
-    # SRC_URL is now 
-    pass
-    # TODO: Populate logic of function body.
-    # NOTE: The logic here will need to take all legacy releases into account.
+# TODO: Create patch_framework.py script file we can include in build layer.
 
 def generate_template(target):
     pass
