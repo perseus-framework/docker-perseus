@@ -759,6 +759,11 @@ def generate_dockerfile_app(target):
     ]
     return output_deploy_image
 
+def patch_framework():
+    pass
+    # TODO: Populate logic of function body.
+    # NOTE: The logic here will need to take all legacy releases into account.
+
 def generate_template(target):
     pass
     # file_path = R'%s/Dockerfile' % (target.path)
