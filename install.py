@@ -725,7 +725,7 @@ def generate_dockferfile_framework():
             R'/${PERSEUS_VERSION} \\'
         ),
         R'\t| tar -xz --strip-components=1; \\',
-        R'\tchmod 0755 /perseus/patch_framework.py; \\'
+        R'\tchmod 0755 /perseus/patch_framework.py; \\',
         R'echo "placeholder for invokation of python script.";',
         R''
     ]
