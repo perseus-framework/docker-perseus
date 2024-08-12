@@ -699,8 +699,33 @@ def generate_dockerfile_wasm_pack():
     return output_wasm_pack
 
 def generate_dockferfile_framework():
-    pass
-    # TODO: populate logic of this function.
+    # TODO: Write Python command required for conditional modifications.
+    fw_pat = re.compile('.*(?=/releases)')
+    fw_match = re.search(
+        pattern=fw_pat,
+        string=PERSEUS_URL
+    )
+    PERSEUS_ROOT = R'%s' % (fw_match.group(0))
+    output_framework = [
+        R'# Create a build stage for the codebase we can run in parallel.',
+        R'FROM base AS framework',
+        R'',
+        R'# Work from the root of the codebase.',
+        R'WORKDIR /perseus',
+        R'',
+        R'# Download the codebase and make conditional modifications.',
+        R'RUN curl --progress-bar \\',
+        R'\t-L %s%s%s \\' % \
+        (
+            PERSEUS_ROOT,
+            R'/tarball',
+            R'/${PERSEUS_VERSION} \\'
+        ),
+        R'\t| tar -xz --strip-components=1; \\',
+        R'echo "placeholder for invokation of python script.";',
+        R''
+    ]
+    return output_framework
 
 def generate_dockerfile_perseus_cli():
     output_perseus_cli = [
@@ -760,6 +785,7 @@ def generate_dockerfile_app(target):
     return output_deploy_image
 
 def patch_framework():
+    # SRC_URL is now 
     pass
     # TODO: Populate logic of function body.
     # NOTE: The logic here will need to take all legacy releases into account.
