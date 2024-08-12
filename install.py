@@ -710,6 +710,9 @@ def generate_dockferfile_framework():
         R'# Create a build stage for the codebase we can run in parallel.',
         R'FROM base AS framework',
         R'',
+        R'# Copy our script for conditional patching into our build layer.',
+        R'COPY patch_framework.py /perseus/patch_framework.py',
+        R'',
         R'# Work from the root of the codebase.',
         R'WORKDIR /perseus',
         R'',
@@ -722,6 +725,7 @@ def generate_dockferfile_framework():
             R'/${PERSEUS_VERSION} \\'
         ),
         R'\t| tar -xz --strip-components=1; \\',
+        R'\tchmod 0755 /perseus/patch_framework.py; \\'
         R'echo "placeholder for invokation of python script.";',
         R''
     ]
