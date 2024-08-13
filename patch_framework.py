@@ -28,6 +28,10 @@ def patch(semver):
         # NOTE: The following file may be included in error prior to
         #       preferred use of the fetching example.
         #   - /perseus/examples/basic/.perseus/server/src/main.rs
+        # Traverse all directories and files in /perseus.
+        #   - Apply changes to each Cargo.toml file found.
+        #   - Apply changes to /perseus/bonnie.toml
+        # NOTE: This path traversal can be used to apply all file changes.
         pass
     elif release == '0.3.1':
         pass
