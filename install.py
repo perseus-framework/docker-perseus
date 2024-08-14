@@ -731,6 +731,43 @@ def generate_dockferfile_framework():
     ]
     return output_framework
 
+def generate_dockerfile_example(semver_override):
+    # Instruct the Dockerfile to use the PERSEUS_VERSION env var by default.
+    src_string = R'/${PERSEUS_VERSION} \\'
+    # If the build process has detected the need to override the release we
+    # source the example(s) from...
+    if semver_override is not None:
+        # Instruct the Dockerfile to use the override instead.
+        src_string = R'/%s \\' % (semver_override)
+    # Parse the PERSEUS_URL string to point to the root of the repository.
+    ex_pat = re.compile('.*(?=/releases)')
+    ex_match = re.search(
+        pattern=ex_pat,
+        string=PERSEUS_URL
+    )
+    EXAMPLE_ROOT = R'%s' % (ex_match.group(0))
+    # Define the Dockerfile syntax used to pull in the example(s) we need.
+    output_example = [
+        R'# Create a build stage for the examples we can run in parallel.',
+        R'FROM base AS examples',
+        R'',
+        R'# Work from the chosen path for examples.',
+        R'WORKDIR /examples',
+        R'',
+        R'# Download the tarball of the examples.',
+        R'RUN curl --progress-bar \\',
+        R'\t-L %s%s%s \\' % \
+        (
+            EXAMPLE_ROOT,
+            R'/tarball',
+            src_string
+        ),
+        R'\t| tar -C /examples/fetching -xz --strip-components=3 \\',
+        R'\tperseus-%s/examples/fetching;' % (src_string),
+        R''
+    ]
+    return output_example
+
 def generate_dockerfile_perseus_cli():
     output_perseus_cli = [
         R'# Create a build stage for `perseus-cli` we can run in parallel.',
