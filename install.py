@@ -17,7 +17,6 @@ GH_API_URL='https://api.github.com/repos/'
 GH_RAW_URL='https://raw.githubusercontent.com/'
 
 # URLs for retrieving current versions of Perseus and Rust.
-# NOTE: https://github.com/framesurge/perseus/releases/download/v0.4.2/perseus-linux-amd64
 PERSEUS_URL='{pfx}framesurge/perseus/releases'.format(pfx=GH_API_URL)
 RUST_URL='{pfx}rust-lang/rust/releases'.format(pfx=GH_API_URL)
 
