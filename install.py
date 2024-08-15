@@ -649,8 +649,10 @@ def generate_dockerfile_bonnie():
         R'WORKDIR /bonnie',
         R'',
         R'# Install crate `bonnie` into the work path.',
-        R'RUN cargo install bonnie --version ${BONNIE_VERSION}; \\',
-        R'\tmv /usr/local/cargo/bin/bonnie .;',
+        R'RUN cargo install bonnie \\',
+        R'\t--version ${BONNIE_VERSION} \\',
+        R'\t--root $PWD \\',
+        R'\t--locked;',
         R''
     ]
     return output_bonnie
