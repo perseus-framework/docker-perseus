@@ -698,8 +698,10 @@ def generate_dockerfile_wasm_pack():
         R'WORKDIR /wasm-pack',
         R'',
         R'# Install crate `wasm-pack` into the work path.',
-        R'RUN cargo install wasm-pack --version ${WASM_PACK_VERSION}; \\',
-        R'\tmv /usr/local/cargo/bin/wasm-pack .;',
+        R'RUN cargo install wasm-pack \\',
+        R'\t--version ${WASM_PACK_VERSION} \\',
+        R'\t--root $PWD \\',
+        R'\t--locked;',
         R''
     ]
     return output_wasm_pack
