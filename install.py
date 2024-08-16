@@ -642,11 +642,9 @@ def generate_dockerfile_binaryen():
         R'# Download, extract, and remove compressed tar of `binaryen`.',
         R'RUN curl \\',
         R'\t--progress-bar \\',
-        R'\t-L %s%s%s \\' % \
+        R'\t-L %s \\' % \
         (
-            BINARYEN_URL,
-            R'/download/version_${BINARYEN_VERSION}',
-            R'/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz'
+            get_tarball_url(BINARYEN_URL, 'BINARYEN_VERSION')
         ),
         R'\t| tar -C $PWD -xz --strip-components=1',
         R''
@@ -671,12 +669,6 @@ def generate_dockerfile_bonnie():
     return output_bonnie
 
 def generate_dockerfile_esbuild():
-    es_pat = re.compile('.*(?=/releases)')
-    es_match = re.search(
-        pattern=es_pat,
-        string=ESBUILD_URL
-    )
-    ESBUILD_ROOT = R'%s' % (es_match.group(0))
     output_esbuild = [
         R'# Create a build stage for `esbuild` we can run in parallel.',
         R'FROM base AS esbuild',
@@ -687,11 +679,9 @@ def generate_dockerfile_esbuild():
         R'# Download, extract, and remove compressed tar of `esbuild`.',
         R'RUN curl \\',
         R'\t--progress-bar \\',
-        R'\t-L %s%s%s \\' % \
+        R'\t-L %s \\' % \
         (
-            ESBUILD_ROOT,
-            '/tarball',
-            '/${ESBUILD_VERSION}'
+            get_tarball_url(ESBUILD_URL, 'ESBUILD_VERSION')
         ),
         R'\t| tar -C $PWD -xz --strip-components=1',
         R''
@@ -716,13 +706,6 @@ def generate_dockerfile_wasm_pack():
     return output_wasm_pack
 
 def generate_dockferfile_framework():
-    # TODO: Write Python command required for conditional modifications.
-    fw_pat = re.compile('.*(?=/releases)')
-    fw_match = re.search(
-        pattern=fw_pat,
-        string=PERSEUS_URL
-    )
-    PERSEUS_ROOT = R'%s' % (fw_match.group(0))
     output_framework = [
         R'# Create a build stage for the codebase we can run in parallel.',
         R'FROM base AS framework',
@@ -735,11 +718,9 @@ def generate_dockferfile_framework():
         R'',
         R'# Download the codebase and make conditional modifications.',
         R'RUN curl --progress-bar \\',
-        R'\t-L %s%s%s \\' % \
+        R'\t-L %s \\' % \
         (
-            PERSEUS_ROOT,
-            R'/tarball',
-            R'/${PERSEUS_VERSION} \\'
+            get_tarball_url(PERSEUS_URL, 'PERSEUS_VERSION')
         ),
         R'\t| tar -xz --strip-components=1; \\',
         R'\tchmod 0700 /perseus/patch_framework.py; \\',
