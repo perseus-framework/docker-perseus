@@ -670,17 +670,13 @@ def generate_dockerfile_esbuild():
         R'# Download, extract, and remove compressed tar of `esbuild`.',
         R'RUN curl \\',
         R'\t--progress-bar \\',
-        R'\t-Lo esbuild-${ESBUILD_VERSION}.tar.gz \\',
-        R'\t%s%s%s; \\' % \
+        R'\t-L %s%s%s \\' % \
         (
             ESBUILD_ROOT,
             '/tarball',
             '/${ESBUILD_VERSION}'
         ),
-        R'\ttar \\',
-        R'\t--strip-components=1 \\',
-        R'\t-xzf esbuild-${ESBUILD_VERSION}.tar.gz; \\',
-        R'\trm -f esbuild-${ESBUILD_VERSION}.tar.gz;',
+        R'\t| tar -C $PWD -xz --strip-components=1',
         R''
     ]
     return output_esbuild
@@ -697,7 +693,7 @@ def generate_dockerfile_wasm_pack():
         R'RUN cargo install wasm-pack \\',
         R'\t--version ${WASM_PACK_VERSION} \\',
         R'\t--root $PWD \\',
-        R'\t--locked;',
+        R'\t--locked',
         R''
     ]
     return output_wasm_pack
