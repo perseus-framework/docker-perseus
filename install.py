@@ -217,6 +217,23 @@ def get_latest_distribution(linux_url):
     ).group(0)
     return distro_latest
 
+# Parse a repo's 'releases' API route into a URL to its tarball.
+def get_tarball_url(repo_url, env_var):
+    tb_pat = re.compile('.*(?=/releases)')
+    tb_match = re.search(
+        pattern=tb_pat,
+        string=repo_url
+    )
+    tb_url = R'%s%s%s%s%s' % \
+    (
+        tb_match.group(0),
+        R'/tarball',
+        R'/${',
+        env_var,
+        R'}'
+    )
+    return tb_url
+
 # Retrieve the dependency string required for a specific package release.
 def get_package_version(target, pkg):
     linux_name = '{ln}'.format(ln=target.os)
