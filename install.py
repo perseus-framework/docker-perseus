@@ -625,17 +625,13 @@ def generate_dockerfile_binaryen():
         R'# Download, extract, and remove compressed tar of `binaryen`.',
         R'RUN curl \\',
         R'\t--progress-bar \\',
-        R'\t-Lo binaryen-${BINARYEN_VERSION}.tar.gz \\',
-        R'\t%s%s%s; \\' % \
+        R'\t-L %s%s%s \\' % \
         (
             BINARYEN_URL,
             R'/download/version_${BINARYEN_VERSION}',
             R'/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz'
         ),
-        R'\ttar \\',
-        R'\t--strip-components=1 \\',
-        R'\t-xzf binaryen-${BINARYEN_VERSION}.tar.gz; \\',
-        R'\trm -f binaryen-${BINARYEN_VERSION}.tar.gz;',
+        R'\t| tar -C $PWD -xz --strip-components=1',
         R''
     ]
     return output_binaryen
