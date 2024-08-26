@@ -11,6 +11,7 @@ import sys
 import re
 import os
 import json
+import glob
 
 # URLs for accessing data hosted on GitHub.
 GH_API_URL='https://api.github.com/repos/'
@@ -422,6 +423,37 @@ def get_package_version(target, pkg):
             spv=pkg_ns.source_package_version
         )
     return output_str
+
+# Find all instances of a given file that are currently present.
+def find_all_of_file(file_name, path_root='/'):
+    if file_name is None:
+        # Failure condition.
+        # TODO: Add error handling - must provide file_name.
+        return None
+    elif path_root == '/':
+        # Failure condition.
+        # TODO: add error handling - path cannot be root ('/').
+        return None
+    # Parse the path provided, if any.
+    if len(path_root) > 1:
+        if path_root[0] != '/':
+            # Prepend the required '/' for the path to be valid.
+            path_root = R'/%s' % (path_root)
+        if path_root[ len(path_root) - 1 ] != '/':
+            # Append the required '/' for the path to be valid.
+            path_root = R'%s/' % (path_root)
+    # Check to see if the path is valid.
+    if os.path.exists(path_root) != True:
+        # Failure condition.
+        # TODO: Add error handling - path_root must exist.
+        return None
+    # Recursively search for all matching files.
+    paths_to_file_name = glob.glob(
+        R'%s**/%s' % (path_root, file_name),
+        recursive=True
+    )
+    # Return the list of paths to all matching files found.
+    return paths_to_file_name
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
