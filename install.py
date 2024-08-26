@@ -16,6 +16,9 @@ import json
 GH_API_URL='https://api.github.com/repos/'
 GH_RAW_URL='https://raw.githubusercontent.com/'
 
+# URL for accessing the API of crates.io.
+CRATES_IO_URL='https://crates.io/api/v1/crates'
+
 # URLs for retrieving current versions of Perseus and Rust.
 PERSEUS_URL='{pfx}framesurge/perseus/releases'.format(pfx=GH_API_URL)
 RUST_URL='{pfx}rust-lang/rust/releases'.format(pfx=GH_API_URL)
