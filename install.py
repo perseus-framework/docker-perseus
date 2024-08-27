@@ -479,6 +479,10 @@ def get_cargo_toml_dependencies(toml_path):
                 output_deps.append(dep_mat.group(0))
     return output_deps
 
+# Upgrade dependency versions in a single Cargo.toml file.
+def upgrade_cargo_toml(toml_path):
+    pass
+
 # Retrieve the value of the `max_stable_version` field for a given crate.
 def get_crate_latest_version(crate_name):
     if crate_name is None:
