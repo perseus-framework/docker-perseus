@@ -435,13 +435,12 @@ def find_all_of_file(file_name, path_root='/'):
         # TODO: add error handling - path cannot be root ('/').
         return None
     # Parse the path provided, if any.
-    if len(path_root) > 1:
-        if path_root[0] != '/':
-            # Prepend the required '/' for the path to be valid.
-            path_root = R'/%s' % (path_root)
-        if path_root[ len(path_root) - 1 ] != '/':
-            # Append the required '/' for the path to be valid.
-            path_root = R'%s/' % (path_root)
+    if path_root[0] != '/':
+        # Prepend the required '/' for the path to be valid.
+        path_root = R'/%s' % (path_root)
+    if path_root[ len(path_root) - 1 ] != '/':
+        # Append the required '/' for the path to be valid.
+        path_root = R'%s/' % (path_root)
     # Check to see if the path is valid.
     if os.path.exists(path_root) != True:
         # Failure condition.
@@ -457,8 +456,28 @@ def find_all_of_file(file_name, path_root='/'):
 
 # Parse out the names of all dependencies in a Cargo.toml file.
 def get_cargo_toml_dependencies(toml_path):
-    # TODO: Populate logic of this function.
-    pass
+    if toml_path is None:
+        # Failure condition.
+        # TODO: Add error handling.
+        return None
+    ct = open(toml_path, mode='r')
+    line_is_dep = False
+    output_deps = []
+    for line in ct:
+        l_str = line.strip()
+        if l_str == '[dependencies]' and not line_is_dep:
+            line_is_dep = True
+        elif l_str == '' and line_is_dep:
+            line_is_dep = False
+        if l_str != '[dependencies]' and line_is_dep:
+            dep_pat = re.compile('(?<=")([^ ]{1,})(?=".*)')
+            dep_mat = re.search(
+                pattern=dep_pat,
+                string=l_str
+            )
+            if dep_mat:
+                output_deps.append(dep_mat.group(0))
+    return output_deps
 
 # Retrieve the value of the `max_stable_version` field for a given crate.
 def get_crate_latest_version(crate_name):
