@@ -460,28 +460,48 @@ def get_cargo_toml_dependencies(toml_path):
         # Failure condition.
         # TODO: Add error handling.
         return None
-    ct = open(toml_path, mode='r')
+    # Open the Cargo.toml file in read-only mode.
+    ct = open(
+        file=toml_path,
+        mode='r'
+    )
     line_is_dep = False
     output_deps = []
+    # Iterate across the lines of the Cargo.toml file.
     for line in ct:
         l_str = line.strip()
+        # Activate retrieval of dependency names.
         if l_str == '[dependencies]' and not line_is_dep:
             line_is_dep = True
+        # Deactivate retrieval of dependency names.
         elif l_str == '' and line_is_dep:
             line_is_dep = False
+        # Conditionally retrieve dependency names if activated.
         if l_str != '[dependencies]' and line_is_dep:
-            dep_pat = re.compile('(?<=")([^ ]{1,})(?=".*)')
+            # Search for valid dependency information.
+            dep_pat = re.compile('^([^ ]{1,}) = (.*)$')
             dep_mat = re.search(
                 pattern=dep_pat,
                 string=l_str
             )
+            # If we have found a dependency...
             if dep_mat:
-                output_deps.append(dep_mat.group(0))
+                # Search through its version information.
+                dep_version = dep_mat.group(2)
+                ignore_pat = re.compile('path = [\'"]{1}')
+                ignore_mat = re.search(
+                    pattern=ignore_pat,
+                    string=dep_version
+                )
+                # If the dependency is not local to the project...
+                if not ignore_mat:
+                    # Append its name to the list of dependency names.
+                    output_deps.append(dep_mat.group(1))
+    # Close the Cargo.toml file once we're finished.
+    ct.close()
+    # Return the list of dependency names.
     return output_deps
 
-# Upgrade dependency versions in a single Cargo.toml file.
-def upgrade_cargo_toml(toml_path):
-    pass
 
 # Retrieve the value of the `max_stable_version` field for a given crate.
 def get_crate_latest_version(crate_name):
@@ -501,6 +521,11 @@ def get_crate_latest_version(crate_name):
         api_obj.crates[0].name == crate_name:
         output_latest_version = api_obj.crates[0].max_stable_version
     return output_latest_version
+
+# Upgrade dependency versions in a single Cargo.toml file.
+def upgrade_cargo_toml(toml_path):
+    # TODO: Populate the logic of this function.
+    pass
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
