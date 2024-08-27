@@ -14,8 +14,8 @@ import json
 import glob
 
 # URLs for accessing data hosted on GitHub.
-GH_API_URL='https://api.github.com/repos/'
-GH_RAW_URL='https://raw.githubusercontent.com/'
+GH_API_URL='https://api.github.com/repos'
+GH_RAW_URL='https://raw.githubusercontent.com'
 
 # URL for accessing the API of crates.io.
 CRATES_IO_URL='https://crates.io/api/v1/crates'
@@ -25,25 +25,25 @@ PERSEUS_URL='{pfx}framesurge/perseus/releases'.format(pfx=GH_API_URL)
 RUST_URL='{pfx}rust-lang/rust/releases'.format(pfx=GH_API_URL)
 
 # URLs for accessing binary dependencies of Perseus.
-BINARYEN_URL='{pfx}WebAssembly/binaryen/releases'.format(pfx=GH_API_URL)
-BONNIE_URL='{pfx}arctic-hen7/bonnie/releases'.format(pfx=GH_API_URL)
-ESBUILD_URL='{pfx}evanw/esbuild/releases'.format(pfx=GH_API_URL)
-WASM_PACK_URL='{pfx}rustwasm/wasm-pack/releases'.format(pfx=GH_API_URL)
-RUSTUP_URL='https://sh.rustup.rs/'
+BINARYEN_URL='{pfx}/WebAssembly/binaryen/releases'.format(pfx=GH_API_URL)
+BONNIE_URL='{pfx}/arctic-hen7/bonnie/releases'.format(pfx=GH_API_URL)
+ESBUILD_URL='{pfx}/evanw/esbuild/releases'.format(pfx=GH_API_URL)
+WASM_PACK_URL='{pfx}/rustwasm/wasm-pack/releases'.format(pfx=GH_API_URL)
+RUSTUP_URL='https://sh.rustup.rs'
 
 # URL for the Docker Hub official image registry.
-DOCKER_HUB_URL='https://hub.docker.com/v2/namespaces/library/repositories/'
+DOCKER_HUB_URL='https://hub.docker.com/v2/namespaces/library/repositories'
 
 # URLs for retrieving current versions of Linux distributions.
-ALPINE_URL='{pfx}alpine'.format(pfx=DOCKER_HUB_URL)
-DEBIAN_URL='{pfx}debian'.format(pfx=DOCKER_HUB_URL)
-FEDORA_URL='{pfx}fedora'.format(pfx=DOCKER_HUB_URL)
-ROCKY_URL='{pfx}rockylinux'.format(pfx=DOCKER_HUB_URL)
-UBUNTU_URL='{pfx}ubuntu'.format(pfx=DOCKER_HUB_URL)
+ALPINE_URL='{pfx}/alpine'.format(pfx=DOCKER_HUB_URL)
+DEBIAN_URL='{pfx}/debian'.format(pfx=DOCKER_HUB_URL)
+FEDORA_URL='{pfx}/fedora'.format(pfx=DOCKER_HUB_URL)
+ROCKY_URL='{pfx}/rockylinux'.format(pfx=DOCKER_HUB_URL)
+UBUNTU_URL='{pfx}/ubuntu'.format(pfx=DOCKER_HUB_URL)
 
 # URLs for retrieving current versions of Alpine Linux packages.
 ALPINE_PKG_URL=[
-    '{pfx}alpinelinux/aports/'.format(pfx=GH_RAW_URL),
+    '{pfx}/alpinelinux/aports/'.format(pfx=GH_RAW_URL),
     '/main/',
     'APKBUILD'
 ]
@@ -540,8 +540,18 @@ def is_patch(semver):
 # Upgrade dependency versions in a single Cargo.toml file.
 def upgrade_cargo_toml(toml_path):
     # TODO: Populate the logic of this function.
+    # Open Cargo.toml in read/write mode (w+).
+    # Extract list of all lines in file.
+    # Iterate over list of lines.
+    # Detect dependencies section header.
+    # Check for valid, non-local crates.
+    # Use the name of each crate to get its latest version.
+    # Check the format of the semver string in the Cargo.toml.
+    # Replace the original semver string with the proper format of new version.
+    # Repeat until finished.
+    # Write the updated list of lines to the Cargo.toml file.
+    # Close the file.
     pass
-
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
