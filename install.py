@@ -455,6 +455,11 @@ def find_all_of_file(file_name, path_root='/'):
     # Return the list of paths to all matching files found.
     return paths_to_file_name
 
+# Parse out the names of all dependencies in a Cargo.toml file.
+def get_cargo_toml_dependencies(toml_path):
+    # TODO: Populate logic of this function.
+    pass
+
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
     dest = target.os
