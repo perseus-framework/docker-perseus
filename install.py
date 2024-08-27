@@ -460,6 +460,10 @@ def get_cargo_toml_dependencies(toml_path):
     # TODO: Populate logic of this function.
     pass
 
+# Retrieve the value of the `max_stable_version` field for a given crate.
+def get_crate_latest_version(crate_name):
+    pass
+
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
     dest = target.os
