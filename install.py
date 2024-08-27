@@ -526,10 +526,15 @@ def get_crate_latest_version(crate_name):
 def is_major(semver):
     pass
 
+# Parse a semver string to see if it contains minor version.
+def is_minor(semver):
+    pass
+
 # Upgrade dependency versions in a single Cargo.toml file.
 def upgrade_cargo_toml(toml_path):
     # TODO: Populate the logic of this function.
     pass
+
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
