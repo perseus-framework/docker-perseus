@@ -481,7 +481,22 @@ def get_cargo_toml_dependencies(toml_path):
 
 # Retrieve the value of the `max_stable_version` field for a given crate.
 def get_crate_latest_version(crate_name):
-    pass
+    if crate_name is None:
+        # Failure condition.
+        # TODO: Add error handling.
+        return None
+    output_latest_version = None
+    crate_api_route = R'%s?q=%s' % (CRATES_IO_URL, crate_name)
+    crate_json = get_data(
+        data_url=crate_api_route,
+        content_type='application/json',
+        req_method='GET'
+    )
+    api_obj = json_to_namespace(crate_json)
+    if api_obj.crates[0].exact_match == 'true' and \
+        api_obj.crates[0].name == crate_name:
+        output_latest_version = api_obj.crates[0].max_stable_version
+    return output_latest_version
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
