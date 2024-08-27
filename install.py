@@ -524,10 +524,17 @@ def get_crate_latest_version(crate_name):
 
 # Parse a semver string to see if it is major version only.
 def is_major(semver):
+    # TODO: Populate the logic of this function.
     pass
 
 # Parse a semver string to see if it contains minor version.
 def is_minor(semver):
+    # TODO: Populate the logic of this function.
+    pass
+
+# Parse a semver string to see if it contains patch version.
+def is_patch(semver):
+    # TODO: Populate the logic of this function.
     pass
 
 # Upgrade dependency versions in a single Cargo.toml file.
