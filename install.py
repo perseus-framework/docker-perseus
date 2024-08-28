@@ -500,7 +500,6 @@ def get_cargo_toml_dependencies(toml_path):
     # Return the list of dependency names.
     return output_deps
 
-
 # Retrieve the value of the `max_stable_version` field for a given crate.
 def get_crate_latest_version(crate_name):
     if crate_name is None:
@@ -601,7 +600,10 @@ def upgrade_cargo_toml(toml_path):
             # Extract the max_stable_version of this crate over the network.
             crate_upgrade = get_crate_latest_version(crate_name)
             # Replace the old semver string with the new one.
-            toml[i].replace(crate_version, crate_upgrade)
+            toml[i].replace(
+                R'"%s"' % (crate_version),
+                R'"%s"' % (crate_upgrade)
+            )
             # If we have not yet applied any upgrades to toml...
             if upgrades_applied == False:
                 # Reflect that we have made at least one successful upgrade.
