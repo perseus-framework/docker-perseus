@@ -537,19 +537,80 @@ def is_patch(semver):
 
 # Upgrade dependency versions in a single Cargo.toml file.
 def upgrade_cargo_toml(toml_path):
-    # TODO: Populate the logic of this function.
-    # Open Cargo.toml in read/write mode (w+).
-    # Extract list of all lines in file.
-    # Iterate over list of lines.
-    # Detect dependencies section header.
-    # Check for valid, non-local crates.
-    # Use the name of each crate to get its latest version.
-    # Check the format of the semver string in the Cargo.toml.
-    # Replace the original semver string with the proper format of new version.
-    # Repeat until finished.
-    # Write the updated list of lines to the Cargo.toml file.
-    # Close the file.
-    pass
+    with open(file=toml_path, mode='r') as ct:
+        toml = ct.readlines()
+    upgrades_applied = False
+    dep_start = toml.index('[dependencies]\n') + 1
+    # TODO: Error handling of EOF edge case for dep_end.
+    dep_end = toml.index('\n', dep_start)
+    ver_chars = R'\^~<>=\*, 0-9\.a-z-'
+    for i in range(dep_start, dep_end):
+        crate_name = None
+        crate_version = None
+        # If this line is not a comment/commented dependency...
+        if toml[i][0] != '#':
+            # Check for the presence of an object in the manifest data.
+            curly_pat = re.compile('^.*\{')
+            curly_mat = re.search(
+                pattern=curly_pat,
+                string=toml[i].strip()
+            )
+            # If this dependency does not contain an object...
+            if curly_mat is None:
+                # Extract the dependency name and the semver string.
+                crate_pat = re.compile(
+                    R'^([a-z-]{1,}) = "([%s]{1,})"$' % \
+                    (ver_chars)
+                )
+                crate_mat = re.search(
+                    pattern=crate_pat,
+                    string=toml[i].strip()
+                )
+                # If we successfully parsed a crate name and version...
+                if crate_mat:
+                    # Store them for later use in the upgrade process.
+                    crate_name = crate_mat.group(1)
+                    crate_version = crate_mat.group(2)
+            else:
+                # This dependency contains an object.
+                # We must check for the presence of a local relative path.
+                # NOTE: Local relative paths are NOT upgraded.
+                path_pat = re.compile('^.*(path = "[^ ]{1,}")')
+                path_mat = re.search(
+                    pattern=path_pat,
+                    string=toml[i].strip()
+                )
+                # If this dependency has no local relative path...
+                if path_mat is None:
+                    # Extract the dependency name and the object semver string.
+                    crate_pat = re.compile(
+                        R'^([a-z-]{1,}) = {.*version = "([%s]{1,})".*}$' % \
+                        (ver_chars)
+                    )
+                    crate_mat = re.search(
+                        pattern=crate_pat,
+                        string=toml[i].strip()
+                    )
+                    # If we successfully parsed a crate name and version...
+                    if crate_mat:
+                        # Store them for later use in the upgrade process.
+                        crate_name = crate_mat.group(1)
+                        crate_version = crate_mat.group(2)
+        # If we have crate information waiting to be processed...
+        if crate_name and crate_version:
+            # Extract the max_stable_version of this crate over the network.
+            crate_upgrade = get_crate_latest_version(crate_name)
+            # Replace the old semver string with the new one.
+            toml[i].replace(crate_version, crate_upgrade)
+            # If we have not yet applied any upgrades to toml...
+            if upgrades_applied == False:
+                # Reflect that we have made at least one successful upgrade.
+                upgrades_applied = True
+    # If any upgrades were applied...
+    if upgrades_applied:
+        # Overwrite the original Cargo.toml file with the upgraded one.
+        with open(file=toml_path, mode='w') as ct:
+            ct.writelines(toml)
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
