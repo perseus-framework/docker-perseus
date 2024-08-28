@@ -588,7 +588,7 @@ def upgrade_cargo_toml(toml_path):
             crate_upgrade = get_crate_latest_version(crate_name)
             # Replace the old semver string with the new one.
             # NOTE: The new semver string is always in M.m.p format.
-            toml[i].replace(
+            toml[i] = toml[i].replace(
                 R'"%s"' % (crate_version),
                 R'"%s"' % (crate_upgrade)
             )
