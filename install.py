@@ -455,6 +455,8 @@ def find_all_of_file(file_name, path_root='/'):
     return paths_to_file_name
 
 # Parse out the names of all dependencies in a Cargo.toml file.
+# NOTE: This function is provided only for completeness, but has been
+#       replaced by `upgrade_cargo_toml()`.
 def get_cargo_toml_dependencies(toml_path):
     if toml_path is None:
         # Failure condition.
