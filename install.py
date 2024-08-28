@@ -602,6 +602,12 @@ def upgrade_cargo_toml(toml_path):
         with open(file=toml_path, mode='w') as ct:
             ct.writelines(toml)
 
+# Perform dependency version upgrades as one batch process.
+def upgrade_all_dependencies():
+    paths = find_all_of_file('Cargo.toml')
+    for p in paths:
+        upgrade_cargo_toml(p)
+
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
     dest = target.os
