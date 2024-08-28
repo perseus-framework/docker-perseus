@@ -521,21 +521,6 @@ def get_crate_latest_version(crate_name):
         output_latest_version = api_obj.crates[0].max_stable_version
     return output_latest_version
 
-# Parse a semver string to see if it is major version only.
-def is_major(semver):
-    # TODO: Populate the logic of this function.
-    pass
-
-# Parse a semver string to see if it contains minor version.
-def is_minor(semver):
-    # TODO: Populate the logic of this function.
-    pass
-
-# Parse a semver string to see if it contains patch version.
-def is_patch(semver):
-    # TODO: Populate the logic of this function.
-    pass
-
 # Upgrade dependency versions in a single Cargo.toml file.
 def upgrade_cargo_toml(toml_path):
     with open(file=toml_path, mode='r') as ct:
@@ -602,6 +587,7 @@ def upgrade_cargo_toml(toml_path):
             # Extract the max_stable_version of this crate over the network.
             crate_upgrade = get_crate_latest_version(crate_name)
             # Replace the old semver string with the new one.
+            # NOTE: The new semver string is always in M.m.p format.
             toml[i].replace(
                 R'"%s"' % (crate_version),
                 R'"%s"' % (crate_upgrade)
