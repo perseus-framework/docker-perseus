@@ -534,7 +534,7 @@ def crate_is_yanked(crate_name, crate_semver):
                 # Indicate that the latest release semver is not newer.
                 latest_is_newer = False
            # If the given release has been yanked...
-           if i.yanked:
+           if v.yanked:
                 # If the latest release is newer than the yanked one...
                 if latest_is_newer:
                     # Update our return value to true and stop looking.
