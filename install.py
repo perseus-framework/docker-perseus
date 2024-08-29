@@ -502,6 +502,39 @@ def get_cargo_toml_dependencies(toml_path):
     # Return the list of dependency names.
     return output_deps
 
+# Scan the API data for a given crate to see if the given version is yanked.
+def crate_is_yanked(crate_name, crate_semver):
+    # TODO: handle errors from improper arguments.
+    # Define the API route used to return published version information.
+    crate_yank_route = R'%s/%s/versions' % (CRATES_IO_URL, crate_name)
+    # Return the JSON of the given crate's releases.
+    yank_json = get_data(
+        data_url=crate_yank_route,
+        content_type='application/json',
+        req_method='GET'
+    )
+    # Convert the JSON string into a SimpleNamespace object.
+    yank_obj = json_to_namespace(yank_json)
+    # Optimistic default that the given release has not been yanked.
+    is_yanked = False
+    # Iterate across all published versions.
+    for i in yank_obj.versions:
+        # Look for the given release as extracted from a Cargo.toml file.
+        chk_pat = re.compile(R'^%s' % (crate_semver))
+        chk_mat = re.search(
+            pattern=chk_pat,
+            string=i.num
+        )
+        # If we have found a match...
+        if chk_mat:
+           # If the given release has been yanked...
+           if i.yanked:
+               # Update our return value to true and stop looking.
+               is_yanked = True
+               break
+    # Return a true or false based on whether the release was yanked.
+    return is_yanked
+
 # Retrieve the value of the `max_stable_version` field for a given crate.
 def get_crate_latest_version(crate_name):
     if crate_name is None:
@@ -516,7 +549,7 @@ def get_crate_latest_version(crate_name):
         req_method='GET'
     )
     api_obj = json_to_namespace(crate_json)
-    if api_obj.crates[0].exact_match == 'true' and \
+    if api_obj.crates[0].exact_match and \
         api_obj.crates[0].name == crate_name:
         output_latest_version = api_obj.crates[0].max_stable_version
     return output_latest_version
