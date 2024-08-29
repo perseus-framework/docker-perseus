@@ -503,7 +503,7 @@ def get_cargo_toml_dependencies(toml_path):
     return output_deps
 
 # Scan the API data for a given crate to see if the given version is yanked.
-def crate_is_yanked(crate_name, crate_semver):
+def crate_is_yanked(crate_name, crate_version):
     # TODO: handle errors from improper arguments.
     # Define the API route used to return published version information.
     crate_yank_route = R'%s/%s/versions' % (CRATES_IO_URL, crate_name)
@@ -522,7 +522,7 @@ def crate_is_yanked(crate_name, crate_semver):
     # Iterate across all published versions.
     for i, v in enumerate(yank_obj.versions):
         # Look for the given release as extracted from a Cargo.toml file.
-        chk_pat = re.compile(R'^%s\.' % (crate_semver))
+        chk_pat = re.compile(R'^%s\.' % (crate_version))
         chk_mat = re.search(
             pattern=chk_pat,
             string=v.num
@@ -586,7 +586,7 @@ def upgrade_cargo_toml(toml_path):
             if curly_mat is None:
                 # Extract the dependency name and the semver string.
                 crate_pat = re.compile(
-                    R'^([a-z-]{1,}) = "([%s]{1,})"$' % \
+                    R'^([_a-z-]{1,}) = "([%s]{1,})"$' % \
                     (ver_chars)
                 )
                 crate_mat = re.search(
@@ -611,7 +611,7 @@ def upgrade_cargo_toml(toml_path):
                 if path_mat is None:
                     # Extract the dependency name and the object semver string.
                     crate_pat = re.compile(
-                        R'^([a-z-]{1,}) = {.*version = "([%s]{1,})".*}$' % \
+                        R'^([_a-z-]{1,}) = {.*version = "([%s]{1,})".*}$' % \
                         (ver_chars)
                     )
                     crate_mat = re.search(
