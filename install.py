@@ -517,21 +517,29 @@ def crate_is_yanked(crate_name, crate_semver):
     yank_obj = json_to_namespace(yank_json)
     # Optimistic default that the given release has not been yanked.
     is_yanked = False
+    # Optimistic default that the latest release is always newer.
+    latest_is_newer = True
     # Iterate across all published versions.
-    for i in yank_obj.versions:
+    for i, v in enumerate(yank_obj.versions):
         # Look for the given release as extracted from a Cargo.toml file.
         chk_pat = re.compile(R'^%s' % (crate_semver))
         chk_mat = re.search(
             pattern=chk_pat,
-            string=i.num
+            string=v.num
         )
         # If we have found a match...
         if chk_mat:
+           # If this is the latest release...
+           if i == 0 and latest_is_newer:
+                # Indicate that the latest release semver is not newer.
+                latest_is_newer = False
            # If the given release has been yanked...
            if i.yanked:
-               # Update our return value to true and stop looking.
-               is_yanked = True
-               break
+                # If the latest release is newer than the yanked one...
+                if latest_is_newer:
+                    # Update our return value to true and stop looking.
+                    is_yanked = True
+                    break
     # Return a true or false based on whether the release was yanked.
     return is_yanked
 
@@ -617,18 +625,20 @@ def upgrade_cargo_toml(toml_path):
                         crate_version = crate_mat.group(2)
         # If we have crate information waiting to be processed...
         if crate_name and crate_version:
-            # Extract the max_stable_version of this crate over the network.
-            crate_upgrade = get_crate_latest_version(crate_name)
-            # Replace the old semver string with the new one.
-            # NOTE: The new semver string is always in M.m.p format.
-            toml[i] = toml[i].replace(
-                R'"%s"' % (crate_version),
-                R'"%s"' % (crate_upgrade)
-            )
-            # If we have not yet applied any upgrades to toml...
-            if upgrades_applied == False:
-                # Reflect that we have made at least one successful upgrade.
-                upgrades_applied = True
+            # If the crate version in the Cargo.toml file has been yanked...
+            if crate_is_yanked(crate_name, crate_version):
+                # Extract the max_stable_version of crate over the network.
+                crate_upgrade = get_crate_latest_version(crate_name)
+                # Replace the old semver string with the new one.
+                # NOTE: The new semver string is always in M.m.p format.
+                toml[i] = toml[i].replace(
+                    R'"%s"' % (crate_version),
+                    R'"%s"' % (crate_upgrade)
+                )
+                # If we have not yet applied any upgrades to toml...
+                if upgrades_applied == False:
+                    # Reflect that we have made at least one upgrade.
+                    upgrades_applied = True
     # If any upgrades were applied...
     if upgrades_applied:
         # Overwrite the original Cargo.toml file with the upgraded one.
