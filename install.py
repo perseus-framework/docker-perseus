@@ -522,7 +522,11 @@ def crate_is_yanked(crate_name, crate_version):
     # Iterate across all published versions.
     for i, v in enumerate(yank_obj.versions):
         # Look for the given release as extracted from a Cargo.toml file.
-        chk_pat = re.compile(R'^%s\.' % (crate_version))
+        # We must check whether the supplied version is in M.m.p format.
+        if crate_version.count('.') < 2:
+            chk_pat = re.compile(R'^%s\.' % (crate_version))
+        else:
+            chk_pat = re.compile(R'^%s' % (crate_version))
         chk_mat = re.search(
             pattern=chk_pat,
             string=v.num
