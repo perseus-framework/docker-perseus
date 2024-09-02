@@ -533,17 +533,18 @@ def crate_is_yanked(crate_name, crate_version):
         )
         # If we have found a match...
         if chk_mat:
-           # If this is the latest release...
-           if i == 0 and latest_is_newer:
+            # If this is the latest release...
+            if i == 0 and latest_is_newer:
                 # Indicate that the latest release semver is not newer.
                 latest_is_newer = False
-           # If the given release has been yanked...
-           if v.yanked:
+            # If the given release has been yanked...
+            if v.yanked:
                 # If the latest release is newer than the yanked one...
                 if latest_is_newer:
-                    # Update our return value to true and stop looking.
+                    # Update our return value to true.
                     is_yanked = True
-                    break
+            # Stop looking once we have found a match.
+            break
     # Return a true or false based on whether the release was yanked.
     return is_yanked
 
@@ -659,16 +660,6 @@ def upgrade_all_dependencies(project_path):
         )
         for p in paths:
             upgrade_cargo_toml(p)
-
-# This is what I did to get `perseus` to compile under v0.3.0:
-#
-# - remove everything but the packages/* entry from the workspace.
-# - update cargo_toml to the latest version (perseus-cli/Cargo.toml).
-# - perform the manual patches to perseus-cli src files (lib.rs, cmd.rs).
-# - cargo build --bin perseus --release.
-# - Copy /perseus/target/release/perseus to /usr/bin/.
-#
-# - That's Literally It!
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
