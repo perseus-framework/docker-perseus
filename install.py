@@ -21,8 +21,8 @@ GH_RAW_URL='https://raw.githubusercontent.com'
 CRATES_IO_URL='https://crates.io/api/v1/crates'
 
 # URLs for retrieving current versions of Perseus and Rust.
-PERSEUS_URL='{pfx}framesurge/perseus/releases'.format(pfx=GH_API_URL)
-RUST_URL='{pfx}rust-lang/rust/releases'.format(pfx=GH_API_URL)
+PERSEUS_URL='{pfx}/framesurge/perseus/releases'.format(pfx=GH_API_URL)
+RUST_URL='{pfx}/rust-lang/rust/releases'.format(pfx=GH_API_URL)
 
 # URLs for accessing binary dependencies of Perseus.
 BINARYEN_URL='{pfx}/WebAssembly/binaryen/releases'.format(pfx=GH_API_URL)
