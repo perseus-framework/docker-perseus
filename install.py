@@ -650,15 +650,25 @@ def upgrade_cargo_toml(toml_path):
             ct.writelines(toml)
 
 # Perform dependency version upgrades as one batch process.
-def upgrade_all_dependencies():
-    codebase = os.getcwd()
-    if codebase == '/perseus':
+def upgrade_all_dependencies(project_path):
+    current_dir = os.getcwd()
+    if current_dir == project_path:
         paths = find_all_of_file(
             file_name='Cargo.toml',
-            path_root=codebase
+            path_root=current_dir
         )
         for p in paths:
             upgrade_cargo_toml(p)
+
+# This is what I did to get `perseus` to compile under v0.3.0:
+#
+# - remove everything but the packages/* entry from the workspace.
+# - update cargo_toml to the latest version (perseus-cli/Cargo.toml).
+# - perform the manual patches to perseus-cli src files (lib.rs, cmd.rs).
+# - cargo build --bin perseus --release.
+# - Copy /perseus/target/release/perseus to /usr/bin/.
+#
+# - That's Literally It!
 
 # Generate the list of packages to be used in the Dockerfile.
 def generate_dockerfile_packages_list(target):
