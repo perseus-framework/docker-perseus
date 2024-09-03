@@ -577,12 +577,19 @@ def upgrade_cargo_toml(toml_path):
         string=''.join(toml)
     )
     if dependencies_exist is None:
+        # Failure condition.
+        # No dependencies block is present in this Cargo.toml file.
         return
+    # Otherwise, we continue processing.
     upgrades_applied = False
-    print('attempting to process: "%s"...' % (toml_path))
     dep_start = toml.index('[dependencies]\n') + 1
-    # TODO: Error handling of EOF edge case for dep_end.
-    dep_end = toml.index('\n', dep_start)
+    try:
+        # Try to find the next blank line at the end of the dependencies block.
+        dep_end = toml.index('\n', dep_start)
+    except:
+        # If no blank line is found, the dependencies block terminates at EOF.
+        dep_end = len(toml) - 1
+    # Define characters that could be present in a semver string.
     ver_chars = R'\^~<>=\*, 0-9\.a-z-'
     for i in range(dep_start, dep_end):
         crate_name = None
