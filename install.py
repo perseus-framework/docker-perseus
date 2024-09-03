@@ -571,7 +571,15 @@ def get_crate_latest_version(crate_name):
 def upgrade_cargo_toml(toml_path):
     with open(file=toml_path, mode='r') as ct:
         toml = ct.readlines()
+    dependencies_pat = re.compile('\[dependencies\]\n')
+    dependencies_exist = re.search(
+        pattern=dependencies_pat,
+        string=''.join(toml)
+    )
+    if dependencies_exist is None:
+        return
     upgrades_applied = False
+    print('attempting to process: "%s"...' % (toml_path))
     dep_start = toml.index('[dependencies]\n') + 1
     # TODO: Error handling of EOF edge case for dep_end.
     dep_end = toml.index('\n', dep_start)
@@ -636,6 +644,11 @@ def upgrade_cargo_toml(toml_path):
                 crate_upgrade = get_crate_latest_version(crate_name)
                 # Replace the old semver string with the new one.
                 # NOTE: The new semver string is always in M.m.p format.
+                #
+                # TODO: Refactor this to apply a [patch] block instead.
+                #       Making changes directly inside [dependencies] should
+                #       be a last resort according to cargo best practices.
+                #
                 toml[i] = toml[i].replace(
                     R'"%s"' % (crate_version),
                     R'"%s"' % (crate_upgrade)
