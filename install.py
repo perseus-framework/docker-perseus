@@ -582,7 +582,7 @@ def upgrade_cargo_toml(toml_path):
         return
     # Otherwise, we continue processing.
     patched_deps = []
-    upgrades_applied = False
+    upgrades_found = False
     dep_start = toml.index('[dependencies]\n')
     try:
         # Try to find the next blank line at the end of the dependencies block.
