@@ -576,9 +576,15 @@ def upgrade_cargo_toml(toml_path):
         pattern=dependencies_pat,
         string=''.join(toml)
     )
-    if dependencies_exist is None:
+    patch_pat = re.compile('\[patch.crates-io\]\n')
+    patch_exists = re.search(
+        pattern=patch_pat,
+        string=''.join(toml)
+    )
+    if dependencies_exist is None or patch_exists is not None:
         # Failure condition.
         # No dependencies block is present in this Cargo.toml file.
+        # OR, we have already patched it.
         return
     # Otherwise, we continue processing.
     patched_deps = []
