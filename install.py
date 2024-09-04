@@ -662,11 +662,11 @@ def upgrade_cargo_toml(toml_path):
                                     )
                 )
                 # If we have not yet identified any upgrades to apply...
-                if upgrades_applied == False:
+                if upgrades_found == False:
                     # Reflect that we have identified at least one upgrade.
-                    upgrades_applied = True
+                    upgrades_found = True
     # If any upgrades were identified...
-    if upgrades_applied:
+    if upgrades_found:
         # Append an empty new line as the last member of the [patch] block.
         patched_deps.append('\n')
         # Define the new toml syntax of the upgraded file.
