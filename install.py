@@ -687,11 +687,11 @@ def upgrade_cargo_toml(toml_path):
 
 # Perform dependency version upgrades as one batch process.
 def upgrade_all_dependencies(project_path):
-    current_dir = os.getcwd()
-    if current_dir == project_path:
+    if os.path.exists(path=project_path):
+        os.chdir(path=project_path)
         paths = find_all_of_file(
             file_name='Cargo.toml',
-            path_root=current_dir
+            path_root=project_path
         )
         for p in paths:
             upgrade_cargo_toml(p)
@@ -710,6 +710,7 @@ def generate_dockerfile_packages_list(target):
             'git',
             'gawk',
             'curl',
+            'ca-certificates',
             'alpine-sdk'
         ]
     elif dest in ('debian', 'ubuntu'):
@@ -720,6 +721,7 @@ def generate_dockerfile_packages_list(target):
             'git',
             'gawk',
             'curl',
+            'ca-certificates',
             'build-essential',
             'apt-transport-https'
         ]
@@ -736,6 +738,7 @@ def generate_dockerfile_packages_list(target):
             'gcc',
             'gawk',
             'curl-minimal',
+            'ca-certificates',
             'automake'
         ]
     elif dest == 'rocky':
@@ -749,6 +752,7 @@ def generate_dockerfile_packages_list(target):
             'gcc',
             'gawk',
             'curl',
+            'ca-certificates',
             'automake'
         ]
     if package_names is None:
