@@ -906,11 +906,6 @@ def generate_dockerfile_base(target):
     ]
     return output_dockerfile_base
 
-#
-# TODO: Update `curl` and `tar` to utilize streamed tarballs with retries.
-# NOTE: This will depricate removal of downloaded tar files via `rm -f`.
-#
-
 def generate_dockerfile_binaryen():
     output_binaryen = [
         R'# Create a build stage for `binaryen` we can run in parallel.',
