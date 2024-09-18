@@ -576,20 +576,13 @@ def upgrade_cargo_toml(toml_path):
         pattern=dependencies_pat,
         string=''.join(toml)
     )
-    patch_pat = re.compile('\[patch.crates-io\]\n')
-    patch_exists = re.search(
-        pattern=patch_pat,
-        string=''.join(toml)
-    )
-    if dependencies_exist is None or patch_exists is not None:
+    if dependencies_exist is None:
         # Failure condition.
         # No dependencies block is present in this Cargo.toml file.
-        # OR, we have already patched it.
         return
     # Otherwise, we continue processing.
-    patched_deps = []
     upgrades_found = False
-    dep_start = toml.index('[dependencies]\n')
+    dep_start = toml.index('[dependencies]\n') + 1
     try:
         # Try to find the next blank line at the end of the dependencies block.
         dep_end = toml.index('\n', dep_start)
@@ -598,11 +591,11 @@ def upgrade_cargo_toml(toml_path):
         dep_end = len(toml) - 1
     # Define characters that could be present in a semver string.
     ver_chars = R'\^~<>=\*, 0-9\.a-z-'
-    for i in range(dep_start + 1, dep_end):
+    for i in range(dep_start, dep_end):
         crate_name = None
         crate_version = None
         # If this line is not a comment/commented dependency...
-        if toml[i][0] != '#':
+        if toml[i][0] != R'#':
             # Check for the presence of an object in the manifest data.
             curly_pat = re.compile('^.*\{')
             curly_mat = re.search(
@@ -656,34 +649,35 @@ def upgrade_cargo_toml(toml_path):
             if crate_is_yanked(crate_name, crate_version):
                 # Extract the max_stable_version of crate over the network.
                 crate_upgrade = get_crate_latest_version(crate_name)
-                # If the patched depdencies list is empty...
-                if len(patched_deps) == 0:
-                    # Append the [patch] block as the first element.
-                    patched_deps.append('[patch.crates-io]\n')
-                # Append the dependency to be patched.
-                patched_deps.append('%s = { version = "%s" }\n' % \
-                                    (
-                                        crate_name,
-                                        crate_upgrade
-                                    )
-                )
-                # If we have not yet identified any upgrades to apply...
-                if upgrades_found == False:
+                # If this dependency has no object...
+                if curly_mat is None:
+                    # Manually patch the version information with an object.
+                    toml[i] = '%s = { version = "%s" }\n' % \
+                    (
+                        crate_name,
+                        crate_upgrade
+                    )
+                    # If we have not yet identified any upgrades to apply...
+                    if upgrades_found == False:
                     # Reflect that we have identified at least one upgrade.
-                    upgrades_found = True
+                        upgrades_found = True
+                # If this dependency has no local relative path...
+                elif path_mat is None:
+                    # Manually patch the semver string in the object.
+                    toml[i] = re.sub(
+                        pattern=R'%s"' % (crate_version),
+                        repl=R'%s"' % (crate_upgrade),
+                        string=toml[i]
+                    )
+                    # If we have not yet identified any upgrades to apply...
+                    if upgrades_found == False:
+                        # Reflect that we have identified at least one upgrade.
+                        upgrades_found = True
     # If any upgrades were identified...
     if upgrades_found:
-        # Append an empty new line as the last member of the [patch] block.
-        patched_deps.append('\n')
-        # Define the new toml syntax of the upgraded file.
-        new_toml = [
-            *toml[0:dep_start],
-            *patched_deps,
-            *toml[dep_start:]
-        ]
         # Overwrite the original Cargo.toml file with the upgraded one.
         with open(file=toml_path, mode='w') as ct:
-            ct.writelines(new_toml)
+            ct.writelines(toml)
 
 # Perform dependency version upgrades as one batch process.
 def upgrade_all_dependencies(project_path):
