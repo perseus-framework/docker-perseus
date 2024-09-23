@@ -568,6 +568,11 @@ def get_crate_latest_version(crate_name):
     return output_latest_version
 
 # Upgrade dependency versions in a single Cargo.toml file.
+
+# TODO:
+# - Add detection of 'beta' within semver strings.
+# - Parse the 'M.m.p' semver of beta releases into a version object.
+# - Migrate overuse of `re` to `try, except` blocks with str.index().
 def upgrade_cargo_toml(toml_path):
     with open(file=toml_path, mode='r') as ct:
         toml = ct.readlines()
