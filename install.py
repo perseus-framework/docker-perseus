@@ -569,25 +569,21 @@ def get_crate_latest_version(crate_name):
 
 # Upgrade dependency versions in a single Cargo.toml file.
 
-# TODO:
-# - Add detection of 'beta' within semver strings.
-# - Parse the 'M.m.p' semver of beta releases into a version object.
-# - Migrate overuse of `re` to `try, except` blocks with str.index().
 def upgrade_cargo_toml(toml_path):
+    dep_block_header_str = '[dependencies]\n'
     with open(file=toml_path, mode='r') as ct:
         toml = ct.readlines()
-    dependencies_pat = re.compile('\[dependencies\]\n')
-    dependencies_exist = re.search(
-        pattern=dependencies_pat,
-        string=''.join(toml)
-    )
-    if dependencies_exist is None:
-        # Failure condition.
-        # No dependencies block is present in this Cargo.toml file.
+    try:
+        ''.join(toml).index(dep_block_header_str)
+    except ValueError:
+        # Failure condition, we can go no further.
         return
     # Otherwise, we continue processing.
+    object_found = False
+    beta_found = False
     upgrades_found = False
-    dep_start = toml.index('[dependencies]\n') + 1
+    # Point to the index of the first dependency in the block.
+    dep_start = toml.index(dep_block_header_str) + 1
     try:
         # Try to find the next blank line at the end of the dependencies block.
         dep_end = toml.index('\n', dep_start)
@@ -599,81 +595,120 @@ def upgrade_cargo_toml(toml_path):
     for i in range(dep_start, dep_end):
         crate_name = None
         crate_version = None
-        # If this line is not a comment/commented dependency...
-        if toml[i][0] != R'#':
-            # Check for the presence of an object in the manifest data.
-            curly_pat = re.compile('^.*\{')
-            curly_mat = re.search(
-                pattern=curly_pat,
-                string=toml[i].strip()
-            )
-            # If this dependency does not contain an object...
-            if curly_mat is None:
-                # Extract the dependency name and the semver string.
-                crate_pat = re.compile(
-                    R'^([_a-z-]{1,}) = "([%s]{1,})"$' % \
-                    (ver_chars)
-                )
-                crate_mat = re.search(
-                    pattern=crate_pat,
-                    string=toml[i].strip()
-                )
-                # If we successfully parsed a crate name and version...
-                if crate_mat:
-                    # Store them for later use in the upgrade process.
-                    crate_name = crate_mat.group(1)
-                    crate_version = crate_mat.group(2)
-            else:
-                # This dependency contains an object.
-                # We must check for the presence of a local relative path.
-                # NOTE: Local relative paths are NOT upgraded.
-                path_pat = re.compile('^.*(path = "[^ ]{1,}")')
-                path_mat = re.search(
-                    pattern=path_pat,
-                    string=toml[i].strip()
-                )
-                # If this dependency has no local relative path...
-                if path_mat is None:
-                    # Extract the dependency name and the object semver string.
-                    crate_pat = re.compile(
-                        R'^([_a-z-]{1,}) = {.*version = "([%s]{1,})".*}$' % \
-                        (ver_chars)
+        with toml[i] as ti:
+            # If this line is not a comment/commented dependency...
+            if ti[0] != '#':
+                try:
+                    # Extract the crate name.
+                    name_offset = ti.index('=') - 1
+                    crate_name = ti[0:name_offset]
+                except ValueError:
+                    # Failure condition.
+                    # There is no assignment operator.
+                    return
+                # Check for the presence of an object in the manifest data.
+                try:
+                    obj_offset = ti.index(
+                        str='{',
+                        start=name_offset
                     )
-                    crate_mat = re.search(
-                        pattern=crate_pat,
-                        string=toml[i].strip()
+                    if object_found == False:
+                        object_found = True
+                    # This dependency contains an object.
+                    # We must check for the presence of a local relative path.
+                    # NOTE: Local relative paths are NOT upgraded.
+                    try:
+                        path_offset = ti.index(
+                            str='path',
+                            start=obj_offset
+                        )
+                        # If this crate contains a local relative path...
+                        if path_offset > obj_offset:
+                            # Ignore updating it and go no further.
+                            return
+                    except ValueError:
+                        # This dependency has no local relative path.
+                        # Extract the manifest object semver string.
+                        try:
+                            version_str = 'version = "'
+                            version_start = ti.index(
+                                str=version_str,
+                                start=obj_offset
+                            ) + len(version_str)
+                            version_end = ti.index(
+                                str='"',
+                                start=version_start
+                            )
+                            crate_version = ti[version_start:version_end]
+                        except ValueError:
+                            # Failure condition.
+                            # This manifest object has no version field.
+                            return
+                except ValueError:
+                    # This dependency does not contain an object.
+                    # Extract the crate semver string.
+                    try:
+                        version_str = ' = "'
+                        version_start = ti.index(
+                            str=version_str
+                        ) + len(version_str)
+                        version_end = ti.index(
+                            str='"',
+                            start=version_start
+                        )
+                        crate_version = ti[version_start:version_end]
+                    except ValueError:
+                        # Failure condition.
+                        # This manifest entry has no version information.
+                        return
+            # If we have crate information waiting to be processed...
+            if crate_name and crate_version:
+                try:
+                    crate_version.index('beta')
+                    # Parse the semver in M.m.p format
+                    sv_Mmp = '[0-9]{1,}'
+                    semver_pat = re.compile(
+                        R'(%s[\.]{1}%s[\.]{1}%s)' % \
+                        (
+                            sv_Mmp,
+                            sv_Mmp,
+                            sv_Mmp
+                        )
                     )
-                    # If we successfully parsed a crate name and version...
-                    if crate_mat:
-                        # Store them for later use in the upgrade process.
-                        crate_name = crate_mat.group(1)
-                        crate_version = crate_mat.group(2)
-        # If we have crate information waiting to be processed...
-        if crate_name and crate_version:
-            # If the crate version in the Cargo.toml file has been yanked...
-            if crate_is_yanked(crate_name, crate_version):
-                # Extract the max_stable_version of crate over the network.
-                crate_upgrade = get_crate_latest_version(crate_name)
-                # If this dependency has no object...
-                if curly_mat is None:
-                    # Manually patch the version information with an object.
-                    toml[i] = '%s = { version = "%s" }\n' % \
-                    (
-                        crate_name,
-                        crate_upgrade
+                    semver_mat = re.search(
+                        pattern=semver_pat,
+                        string=crate_version
                     )
-                    # If we have not yet identified any upgrades to apply...
-                    if upgrades_found == False:
-                    # Reflect that we have identified at least one upgrade.
-                        upgrades_found = True
-                # If this dependency has no local relative path...
-                elif path_mat is None:
-                    # Manually patch the semver string in the object.
-                    toml[i] = re.sub(
-                        pattern=R'%s"' % (crate_version),
-                        repl=R'%s"' % (crate_upgrade),
-                        string=toml[i]
-                    )
+                    if semver_mat:
+                        crate_version = semver_mat.group(1)
+                        # If we have not yet identified any upgrades to apply...
+                        if beta_found == False:
+                        # Reflect that we have identified at least one upgrade.
+                            beta_found = True
+                except ValueError:
+                    # The crate is not a beta release.
+                    # Continue processing this crate.
+                    pass
+                # If the crate version in the Cargo.toml file has been yanked...
+                if crate_is_yanked(crate_name, crate_version) or beta_found:
+                    # Extract the max_stable_version of crate over the network.
+                    crate_upgrade = get_crate_latest_version(crate_name)
+                    # If this dependency has no object...
+                    if object_found == False:
+                        # Manually patch the version information with an object.
+                        ti = '%s = { version = "%s" }\n' % \
+                        (
+                            crate_name,
+                            crate_upgrade
+                        )
+                    # If this dependency has no local relative path...
+                    else:
+                        # Manually patch the semver string in the object.
+                        ti = re.sub(
+                            pattern=R'%s"' % (crate_version),
+                            repl=R'%s"' % (crate_upgrade),
+                            string=ti
+                        )
                     # If we have not yet identified any upgrades to apply...
                     if upgrades_found == False:
                         # Reflect that we have identified at least one upgrade.
