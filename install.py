@@ -502,6 +502,35 @@ def get_cargo_toml_dependencies(toml_path):
     # Return the list of dependency names.
     return output_deps
 
+def strip_pre_release(crate_version):
+    output_semver = crate_version
+    pre_release_found = False
+    for pre in ('-alpha', '-beta', '-rc'):
+        try:
+            output_semver.index(pre)
+            if pre_release_found == False:
+                pre_release_found = True
+        except ValueError:
+            pass
+    if pre_release_found:
+        # Parse the semver in M.m.p format
+        sv_Mmp = '[0-9]{1,}'
+        semver_pat = re.compile(
+            R'(%s[\.]{1}%s[\.]{1}%s)' % \
+            (
+                sv_Mmp,
+                sv_Mmp,
+                sv_Mmp
+            )
+        )
+        semver_mat = re.search(
+            pattern=semver_pat,
+            string=output_semver
+        )
+        if semver_mat:
+            output_semver = semver_mat.group(1)
+    return output_semver
+
 # Scan the API data for a given crate to see if the given version is yanked.
 def crate_is_yanked(crate_name, crate_version):
     # TODO: handle errors from improper arguments.
@@ -580,7 +609,7 @@ def upgrade_cargo_toml(toml_path):
         return
     # Otherwise, we continue processing.
     object_found = False
-    beta_found = False
+    pre_rel_found = False
     upgrades_found = False
     # Point to the index of the first dependency in the block.
     dep_start = toml.index(dep_block_header_str) + 1
@@ -661,36 +690,18 @@ def upgrade_cargo_toml(toml_path):
                         # Failure condition.
                         # This manifest entry has no version information.
                         return
-            # If we have crate information waiting to be processed...
-            if crate_name and crate_version:
-                try:
-                    crate_version.index('beta')
-                    # Parse the semver in M.m.p format
-                    sv_Mmp = '[0-9]{1,}'
-                    semver_pat = re.compile(
-                        R'(%s[\.]{1}%s[\.]{1}%s)' % \
-                        (
-                            sv_Mmp,
-                            sv_Mmp,
-                            sv_Mmp
-                        )
-                    )
-                    semver_mat = re.search(
-                        pattern=semver_pat,
-                        string=crate_version
-                    )
-                    if semver_mat:
-                        crate_version = semver_mat.group(1)
+                # If we have crate information waiting to be processed...
+                if crate_name and crate_version:
+                    crate_version_old = crate_version
+                    crate_version = strip_pre_release(crate_version_old)
+                    # If the crate version has changed...
+                    if crate_version_old != crate_version:
                         # If we have not yet identified any upgrades to apply...
-                        if beta_found == False:
-                        # Reflect that we have identified at least one upgrade.
-                            beta_found = True
-                except ValueError:
-                    # The crate is not a beta release.
-                    # Continue processing this crate.
-                    pass
+                        if pre_rel_found == False:
+                            # We have identified at least one upgrade.
+                            pre_rel_found = True
                 # If the crate version in the Cargo.toml file has been yanked...
-                if crate_is_yanked(crate_name, crate_version) or beta_found:
+                if crate_is_yanked(crate_name, crate_version) or pre_rel_found:
                     # Extract the max_stable_version of crate over the network.
                     crate_upgrade = get_crate_latest_version(crate_name)
                     # If this dependency has no object...
