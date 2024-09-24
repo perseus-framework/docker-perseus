@@ -591,6 +591,29 @@ def line_contains_object(manifest_str, opt_field_list):
         pass
     return (output_obj_found, output_obj_values)
 
+def upgrade_dependency(dep_str,
+                       name_str,
+                       version_str,
+                       upgrade_str,
+                       manifest_has_obj):
+    output_str = dep_str
+    # If this dependency has no object...
+    if manifest_has_obj:
+        # Manually patch the semver string in the object.
+        output_str = re.sub(
+            pattern=R'%s"' % (version_str),
+            repl=R'%s"' % (upgrade_str),
+            string=dep_str
+        )
+    else:
+        # Manually patch the version information with an object.
+        output_str = '%s = { version = "%s" }\n' % \
+        (
+            name_str,
+            upgrade_str
+        )
+    return output_str
+
 # Scan the API data for a given crate to see if the given version is yanked.
 def crate_is_yanked(crate_name, crate_version):
     # TODO: handle errors from improper arguments.
@@ -719,22 +742,13 @@ def upgrade_cargo_toml(toml_path):
                 if crate_is_yanked(crate_name, crate_version) or pre_rel_found:
                     # Extract the max_stable_version of crate over the network.
                     crate_upgrade = get_crate_latest_version(crate_name)
-                    # If this dependency has no object...
-                    if object_found == False:
-                        # Manually patch the version information with an object.
-                        ti = '%s = { version = "%s" }\n' % \
-                        (
-                            crate_name,
-                            crate_upgrade
-                        )
-                    # If this dependency has no local relative path...
-                    else:
-                        # Manually patch the semver string in the object.
-                        ti = re.sub(
-                            pattern=R'%s"' % (crate_version),
-                            repl=R'%s"' % (crate_upgrade),
-                            string=ti
-                        )
+                    ti = upgrade_dependency(
+                        ti,
+                        crate_name,
+                        crate_version,
+                        crate_upgrade,
+                        object_found
+                    )
                     # If we have not yet identified any upgrades to apply...
                     if upgrades_found == False:
                         # Reflect that we have identified at least one upgrade.
