@@ -723,8 +723,6 @@ def upgrade_cargo_toml(toml_path):
                     # This dependency does not contain an object.
                     # Extract the crate semver string.
                     crate_version = extract_crate_version(ti)
-                    if crate_version is None:
-                        return
                 # If we have crate information waiting to be processed...
                 if crate_name and crate_version:
                     crate_version_old = crate_version
@@ -735,6 +733,8 @@ def upgrade_cargo_toml(toml_path):
                         if pre_rel_found == False:
                             # We have identified at least one upgrade.
                             pre_rel_found = True
+                else:
+                    return
                 # If the crate version in the Cargo.toml file has been yanked...
                 if crate_is_yanked(crate_name, crate_version) or pre_rel_found:
                     # Extract the max_stable_version of crate over the network.
