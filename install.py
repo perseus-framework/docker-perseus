@@ -537,6 +537,17 @@ def line_is_commented(line_str):
         return True
     return False
 
+def extract_crate_name(crate_str):
+    output_name = None
+    try:
+        name_offset = crate_str.index('=') - 1
+        output_name = crate_str[0:name_offset]
+    except ValueError:
+        # Failure condition.
+        # There is no assignment operator.
+        pass
+    return output_name
+
 # Scan the API data for a given crate to see if the given version is yanked.
 def crate_is_yanked(crate_name, crate_version):
     # TODO: handle errors from improper arguments.
@@ -631,15 +642,8 @@ def upgrade_cargo_toml(toml_path):
         crate_version = None
         with toml[i] as ti:
             # If this line is not a comment/commented dependency...
-            if line_is_commented(ti) == False:
-                try:
-                    # Extract the crate name.
-                    name_offset = ti.index('=') - 1
-                    crate_name = ti[0:name_offset]
-                except ValueError:
-                    # Failure condition.
-                    # There is no assignment operator.
-                    return
+            if line_is_commented(ti) is not True:
+                crate_name = extract_crate_name(ti)
                 # Check for the presence of an object in the manifest data.
                 try:
                     obj_offset = ti.index(
