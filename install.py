@@ -548,6 +548,21 @@ def extract_crate_name(crate_str):
         pass
     return output_name
 
+def extract_crate_version(crate_str):
+    output_version = None
+    try:
+        pfx = R' = "'
+        version_start = crate_str.index(pfx) + len(pfx)
+        version_end = crate_str.index(
+            str=R'"',
+            start=version_start
+        )
+        if version_start < version_end:
+            output_version = crate_str[version_start:version_end]
+    except ValueError:
+        pass
+    return output_version
+
 def line_contains_object(manifest_str, opt_field_list):
     obj_start = None
     obj_end = None
@@ -687,19 +702,8 @@ def upgrade_cargo_toml(toml_path):
                 else:
                     # This dependency does not contain an object.
                     # Extract the crate semver string.
-                    try:
-                        version_str = ' = "'
-                        version_start = ti.index(
-                            str=version_str
-                        ) + len(version_str)
-                        version_end = ti.index(
-                            str='"',
-                            start=version_start
-                        )
-                        crate_version = ti[version_start:version_end]
-                    except ValueError:
-                        # Failure condition.
-                        # This manifest entry has no version information.
+                    crate_version = extract_crate_version(ti)
+                    if crate_version is None:
                         return
                 # If we have crate information waiting to be processed...
                 if crate_name and crate_version:
