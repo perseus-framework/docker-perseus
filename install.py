@@ -533,20 +533,48 @@ def strip_pre_release(crate_version):
     return output_semver
 
 def line_is_commented(line_str):
-    if line_str[0] == '#':
+    if line_str[0] == R'#':
         return True
     return False
 
 def extract_crate_name(crate_str):
     output_name = None
     try:
-        name_offset = crate_str.index('=') - 1
+        name_offset = crate_str.index(R'=') - 1
         output_name = crate_str[0:name_offset]
     except ValueError:
         # Failure condition.
         # There is no assignment operator.
         pass
     return output_name
+
+def line_contains_object(manifest_str, opt_field_list):
+    obj_start = None
+    obj_end = None
+    output_obj_found = False
+    output_obj_values = {}
+    try:
+        obj_start = manifest_str.index(R'{')
+        obj_end = manifest_str.index(R'}')
+        if obj_start < obj_end:
+            if isinstance(opt_field_list, list):
+                for i in opt_field_list:
+                    with opt_field_list[i] as field:
+                        if isinstance(field, str):
+                            val_pat = re.compile(
+                                R'.*%s = "([^ ]{1,})".*' % \
+                                (field)
+                            )
+                            val_mat = re.search(
+                                pattern=val_pat,
+                                string=manifest_str
+                            )
+                            if val_mat:
+                                output_obj_values[field] = val_mat.group(1)
+            output_obj_found = True
+    except:
+        pass
+    return (output_obj_found, output_obj_values)
 
 # Scan the API data for a given crate to see if the given version is yanked.
 def crate_is_yanked(crate_name, crate_version):
@@ -625,6 +653,7 @@ def upgrade_cargo_toml(toml_path):
         return
     # Otherwise, we continue processing.
     object_found = False
+    rel_path_found = False
     pre_rel_found = False
     upgrades_found = False
     # Point to the index of the first dependency in the block.
@@ -644,45 +673,18 @@ def upgrade_cargo_toml(toml_path):
             # If this line is not a comment/commented dependency...
             if line_is_commented(ti) is not True:
                 crate_name = extract_crate_name(ti)
-                # Check for the presence of an object in the manifest data.
-                try:
-                    obj_offset = ti.index(
-                        str='{',
-                        start=name_offset
-                    )
-                    if object_found == False:
-                        object_found = True
-                    # This dependency contains an object.
-                    # We must check for the presence of a local relative path.
-                    # NOTE: Local relative paths are NOT upgraded.
-                    try:
-                        path_offset = ti.index(
-                            str='path',
-                            start=obj_offset
-                        )
-                        # If this crate contains a local relative path...
-                        if path_offset > obj_offset:
-                            # Ignore updating it and go no further.
-                            return
-                    except ValueError:
-                        # This dependency has no local relative path.
-                        # Extract the manifest object semver string.
-                        try:
-                            version_str = 'version = "'
-                            version_start = ti.index(
-                                str=version_str,
-                                start=obj_offset
-                            ) + len(version_str)
-                            version_end = ti.index(
-                                str='"',
-                                start=version_start
-                            )
-                            crate_version = ti[version_start:version_end]
-                        except ValueError:
-                            # Failure condition.
-                            # This manifest object has no version field.
-                            return
-                except ValueError:
+                object_found, obj_kv = line_contains_object(
+                    manifest_str=ti,
+                    opt_field_list=[
+                        'path',
+                        'version'
+                    ]
+                )
+                if object_found:
+                    if 'path' in obj_kv or obj_kv.get('version') is None:
+                        return
+                    crate_version = obj_kv['version']
+                else:
                     # This dependency does not contain an object.
                     # Extract the crate semver string.
                     try:
