@@ -702,8 +702,6 @@ def upgrade_cargo_toml(toml_path):
     except ValueError:
         # If no blank line is found, the dependencies block terminates at EOF.
         dep_end = len(toml) - 1
-    # Define characters that could be present in a semver string.
-    ver_chars = R'\^~<>=\*, 0-9\.a-z-'
     for i in range(dep_start, dep_end):
         crate_name = None
         crate_version = None
