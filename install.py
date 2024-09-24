@@ -510,8 +510,9 @@ def strip_pre_release(crate_version):
             output_semver.index(pre)
             if pre_release_found == False:
                 pre_release_found = True
+                break
         except ValueError:
-            pass
+            continue
     if pre_release_found:
         # Parse the semver in M.m.p format
         sv_Mmp = '[0-9]{1,}'
@@ -530,6 +531,11 @@ def strip_pre_release(crate_version):
         if semver_mat:
             output_semver = semver_mat.group(1)
     return output_semver
+
+def line_is_commented(line_str):
+    if line_str[0] == '#':
+        return True
+    return False
 
 # Scan the API data for a given crate to see if the given version is yanked.
 def crate_is_yanked(crate_name, crate_version):
@@ -597,7 +603,6 @@ def get_crate_latest_version(crate_name):
     return output_latest_version
 
 # Upgrade dependency versions in a single Cargo.toml file.
-
 def upgrade_cargo_toml(toml_path):
     dep_block_header_str = '[dependencies]\n'
     with open(file=toml_path, mode='r') as ct:
@@ -616,7 +621,7 @@ def upgrade_cargo_toml(toml_path):
     try:
         # Try to find the next blank line at the end of the dependencies block.
         dep_end = toml.index('\n', dep_start)
-    except:
+    except ValueError:
         # If no blank line is found, the dependencies block terminates at EOF.
         dep_end = len(toml) - 1
     # Define characters that could be present in a semver string.
@@ -626,7 +631,7 @@ def upgrade_cargo_toml(toml_path):
         crate_version = None
         with toml[i] as ti:
             # If this line is not a comment/commented dependency...
-            if ti[0] != '#':
+            if line_is_commented(ti) == False:
                 try:
                     # Extract the crate name.
                     name_offset = ti.index('=') - 1
