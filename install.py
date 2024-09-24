@@ -691,7 +691,6 @@ def upgrade_cargo_toml(toml_path):
         return
     # Otherwise, we continue processing.
     object_found = False
-    rel_path_found = False
     pre_rel_found = False
     upgrades_found = False
     # Point to the index of the first dependency in the block.
